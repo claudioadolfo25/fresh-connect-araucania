@@ -77,14 +77,13 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Lovable App" },
-      { name: "description", content: "Lovable Generated Project" },
-      { name: "author", content: "Lovable" },
-      { property: "og:title", content: "Lovable App" },
-      { property: "og:description", content: "Lovable Generated Project" },
+      { title: "Claudio Ayelef · Abastecimiento de Productos Frescos en La Araucanía" },
+      { name: "description", content: "En alianza con PEPEPALTA.CL. Palta Hass, tomate, limón, cebolla y ajo para retail y Horeca en La Araucanía. Cotización y estimación instantánea." },
+      { name: "author", content: "Claudio Ayelef" },
+      { property: "og:title", content: "Claudio Ayelef · Abastecimiento Estratégico de Productos Frescos" },
+      { property: "og:description", content: "Retail y Horeca en La Araucanía. En alianza con PEPEPALTA.CL. Palta Hass, tomate, limón, cebolla y ajo." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:site", content: "@Lovable" },
     ],
     links: [
       {
