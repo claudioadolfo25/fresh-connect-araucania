@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { QRCodeSVG } from "qrcode.react";
+import claudioSupermercado from "@/assets/claudio-supermercado.jpg";
 
 export const Route = createFileRoute("/")({
   component: Index,
@@ -40,8 +41,19 @@ EMAIL:key@co-kizuna.com
 NOTE:Tu asesor estratégico en el abastecimiento de productos frescos
 END:VCARD`;
 
-const COVERAGE_ACTIVE = ["Temuco", "Villarrica", "Pucón"];
-const COVERAGE_SOON = ["Lautaro", "Cholchol", "Carahue", "Labranza", "Pitrufquén", "Gorbea"];
+// 32 comunas de La Araucanía agrupadas por provincia
+const CAUTIN = [
+  "Carahue", "Cholchol", "Cunco", "Curarrehue", "Freire", "Galvarino",
+  "Gorbea", "Lautaro", "Loncoche", "Melipeuco", "Nueva Imperial",
+  "Padre Las Casas", "Perquenco", "Pitrufquén", "Pucón", "Saavedra",
+  "Temuco", "Teodoro Schmidt", "Toltén", "Vilcún", "Villarrica",
+];
+const MALLECO = [
+  "Angol", "Collipulli", "Curacautín", "Ercilla", "Lonquimay",
+  "Los Sauces", "Lumaco", "Purén", "Renaico", "Traiguén", "Victoria",
+];
+const COVERAGE_ACTIVE = ["Temuco", "Padre Las Casas", "Villarrica", "Pucón", "Angol"];
+const ALL_COMUNAS = [...CAUTIN, ...MALLECO];
 
 const RUBROS = ["Supermercado", "Restaurante", "Hotel", "Casino", "Cafetería", "Juguería", "Otro"];
 const VOLUMES = ["<100 kg", "100–500 kg", "500–1.000 kg", ">1.000 kg"];
@@ -62,6 +74,7 @@ function Index() {
       <QRCard />
       <Coverage />
       <Testimonials />
+      <SupermarketBanner />
       <QuoteForm />
       <Trust />
       <Footer />
@@ -519,7 +532,7 @@ function QuoteForm() {
             <SelectField label="Rubro" name="rubro" required options={RUBROS} />
             <Field label="Correo electrónico" name="email" type="email" required />
             <Field label="Teléfono / WhatsApp" name="telefono" required />
-            <SelectField label="Comuna de entrega" name="comuna" required options={[...COVERAGE_ACTIVE, ...COVERAGE_SOON]} />
+        <SelectField label="Comuna de entrega" name="comuna" required options={ALL_COMUNAS} />
             <SelectField label="Volumen estimado semanal" name="volumen" required options={VOLUMES} />
             <Field label="Mensaje (opcional)" name="mensaje" as="textarea" className="md:col-span-2" />
 
