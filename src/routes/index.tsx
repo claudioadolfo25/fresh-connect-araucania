@@ -440,26 +440,52 @@ function ProvinciaBlock({
 
 const TESTIMONIALS = [
   {
-    rubro: "Restaurante",
+    rubro: "HORECA · Restaurante",
     quote:
       "Antes perseguíamos al proveedor; ahora Claudio nos avisa con anticipación y resuelve todo. La palta Hass es impecable.",
     author: "Gerente de Restaurante · Temuco",
   },
   {
-    rubro: "Hotel",
+    rubro: "HORECA · Hotel",
     quote:
       "La consistencia en la entrega y la calidad nos permite ofrecer un desayuno de excelencia todos los días.",
     author: "Jefe de Compras · Hotel Boutique, Pucón",
   },
   {
-    rubro: "Casino",
+    rubro: "HORECA · Casino",
     quote:
       "Nos ayuda a planificar la compra, recomienda calibres y siempre está disponible. Es un socio estratégico.",
     author: "Encargado de Abastecimiento · Casino, Temuco",
   },
+  {
+    rubro: "Retail · Supermercado",
+    quote:
+      "La rotación en góndola mejoró notoriamente. Calibres uniformes, entregas puntuales y precios negociados con transparencia.",
+    author: "Jefe de Frutas y Verduras · Supermercado Regional, Temuco",
+  },
+  {
+    rubro: "Retail · Minimarket",
+    quote:
+      "Para un local de barrio, tener un solo contacto que resuelve pedidos chicos con calidad de mayorista es un antes y un después.",
+    author: "Propietario · Minimarket, Villarrica",
+  },
+  {
+    rubro: "Exportador · Palta Hass",
+    quote:
+      "Coordinamos volúmenes de exportación con calibres específicos. Claudio entiende la exigencia del mercado externo y cumple.",
+    author: "Gerente Comercial · Exportadora Frutícola, Región de La Araucanía",
+  },
 ];
 
+const TESTIMONIAL_FILTERS = ["Todos", "Exportador", "Retail", "HORECA"] as const;
+
 function Testimonials() {
+  const [filter, setFilter] = useState<(typeof TESTIMONIAL_FILTERS)[number]>("Todos");
+  const items =
+    filter === "Todos"
+      ? TESTIMONIALS
+      : TESTIMONIALS.filter((t) => t.rubro.toLowerCase().startsWith(filter.toLowerCase()));
+
   return (
     <section id="testimonios" className="mx-auto max-w-6xl px-5 py-16">
       <div className="mb-8">
@@ -467,9 +493,28 @@ function Testimonials() {
         <h2 className="mt-2 text-3xl font-semibold tracking-tight md:text-4xl">
           Confianza construida con clientes reales
         </h2>
+        <p className="mt-2 max-w-2xl text-sm text-muted-foreground">
+          Filtra por rubro del cliente: exportadores de fruta, cadenas de retail y operadores
+          HORECA (Hoteles, Restaurantes, Casinos y Cafeterías).
+        </p>
+        <div className="mt-5 flex flex-wrap gap-2">
+          {TESTIMONIAL_FILTERS.map((f) => (
+            <button
+              key={f}
+              onClick={() => setFilter(f)}
+              className={
+                filter === f
+                  ? "rounded-full bg-primary px-4 py-1.5 text-xs font-medium text-primary-foreground"
+                  : "rounded-full border border-border bg-card px-4 py-1.5 text-xs text-muted-foreground hover:text-primary"
+              }
+            >
+              {f}
+            </button>
+          ))}
+        </div>
       </div>
       <div className="grid gap-4 md:grid-cols-3">
-        {TESTIMONIALS.map((t) => (
+        {items.map((t) => (
           <div key={t.author} className="rounded-2xl border border-border bg-card p-6">
             <div className="text-xs font-medium uppercase tracking-widest text-[color:var(--primary-deep)]">
               {t.rubro}
@@ -482,6 +527,52 @@ function Testimonials() {
       <p className="mt-6 text-xs text-muted-foreground">
         Logos de clientes se publican solo con autorización expresa de cada uno.
       </p>
+    </section>
+  );
+}
+
+function SupermarketBanner() {
+  return (
+    <section className="mx-auto max-w-6xl px-5 py-16">
+      <div className="relative overflow-hidden rounded-3xl border border-border bg-card shadow-sm">
+        <div className="grid gap-0 md:grid-cols-2">
+          <div className="relative min-h-[280px] md:min-h-[440px]">
+            <img
+              src={claudioSupermercado}
+              alt="Claudio Ayelef en el sector de frutas y verduras de un supermercado en La Araucanía"
+              className="absolute inset-0 h-full w-full object-cover"
+              loading="lazy"
+            />
+            <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent md:bg-gradient-to-r md:from-transparent md:via-transparent md:to-card/80" />
+          </div>
+          <div className="flex flex-col justify-center p-8 md:p-12">
+            <div className="text-xs uppercase tracking-widest text-muted-foreground">
+              現場 · En terreno
+            </div>
+            <h2 className="mt-2 text-3xl font-semibold leading-tight tracking-tight md:text-4xl">
+              En la sala, junto a tu sector de frutas y verduras.
+            </h2>
+            <p className="mt-4 text-sm leading-relaxed text-muted-foreground">
+              No solo despachamos: acompañamos la operación en piso. Reviso calibres, rotación
+              y presentación en góndola para que la palta Hass, el tomate, el limón, la cebolla y
+              el ajo lleguen a tu cliente final tal como se seleccionaron en origen.
+            </p>
+            <ul className="mt-6 space-y-2 text-sm">
+              <li className="flex gap-2"><span className="text-[color:var(--accent-fresh)]">◆</span> Auditoría de calidad en punto de venta</li>
+              <li className="flex gap-2"><span className="text-[color:var(--accent-fresh)]">◆</span> Recomendación de calibres por temporada</li>
+              <li className="flex gap-2"><span className="text-[color:var(--accent-fresh)]">◆</span> Reposición coordinada con tu equipo de frutería</li>
+            </ul>
+            <div className="mt-8">
+              <a
+                href="#cotizar"
+                className="inline-flex items-center rounded-full bg-primary px-6 py-3 text-sm font-medium text-primary-foreground hover:opacity-90"
+              >
+                Agendar visita a mi sala →
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
     </section>
   );
 }
