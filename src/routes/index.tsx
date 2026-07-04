@@ -370,43 +370,71 @@ function Coverage() {
         <h2 className="mt-2 text-3xl font-semibold tracking-tight md:text-4xl">
           Región de La Araucanía
         </h2>
+        <p className="mt-3 max-w-2xl text-sm text-muted-foreground">
+          La Región de La Araucanía está conformada por 32 comunas distribuidas en dos
+          provincias: <strong className="text-foreground">Cautín</strong> (21 comunas) y{" "}
+          <strong className="text-foreground">Malleco</strong> (11 comunas). Operamos en toda la
+          región con zonas activas y de expansión.
+        </p>
 
         <div className="mt-8 grid gap-8 md:grid-cols-2">
-          <div>
-            <div className="mb-3 flex items-center gap-2 text-sm font-medium">
-              <span className="h-2 w-2 rounded-full bg-[color:var(--accent-fresh)]" />
-              Zona activa
-            </div>
-            <div className="flex flex-wrap gap-2">
-              {COVERAGE_ACTIVE.map((c) => (
-                <span
-                  key={c}
-                  className="rounded-full bg-primary px-3 py-1 text-xs font-medium text-primary-foreground"
-                >
-                  {c}
-                </span>
-              ))}
-            </div>
-          </div>
-          <div>
-            <div className="mb-3 flex items-center gap-2 text-sm font-medium text-muted-foreground">
-              <span className="h-2 w-2 rounded-full bg-muted-foreground/60" />
-              Próximamente / consultar
-            </div>
-            <div className="flex flex-wrap gap-2">
-              {COVERAGE_SOON.map((c) => (
-                <span
-                  key={c}
-                  className="rounded-full border border-border bg-background px-3 py-1 text-xs text-muted-foreground"
-                >
-                  {c}
-                </span>
-              ))}
-            </div>
-          </div>
+          <ProvinciaBlock
+            titulo="Provincia de Cautín"
+            subtitulo="21 comunas · Capital regional: Temuco"
+            comunas={CAUTIN}
+          />
+          <ProvinciaBlock
+            titulo="Provincia de Malleco"
+            subtitulo="11 comunas · Capital provincial: Angol"
+            comunas={MALLECO}
+          />
+        </div>
+
+        <div className="mt-8 flex flex-wrap items-center gap-3 rounded-2xl border border-border bg-background p-4 text-xs">
+          <span className="inline-flex items-center gap-2 font-medium">
+            <span className="h-2 w-2 rounded-full bg-[color:var(--accent-fresh)]" />
+            Zona activa
+          </span>
+          <span className="text-muted-foreground">
+            Ruta con despacho recurrente. Otras comunas: consultar frecuencia.
+          </span>
         </div>
       </div>
     </section>
+  );
+}
+
+function ProvinciaBlock({
+  titulo,
+  subtitulo,
+  comunas,
+}: {
+  titulo: string;
+  subtitulo: string;
+  comunas: string[];
+}) {
+  return (
+    <div>
+      <div className="mb-1 text-sm font-semibold">{titulo}</div>
+      <div className="mb-4 text-xs text-muted-foreground">{subtitulo}</div>
+      <div className="flex flex-wrap gap-2">
+        {comunas.map((c) => {
+          const active = COVERAGE_ACTIVE.includes(c);
+          return (
+            <span
+              key={c}
+              className={
+                active
+                  ? "rounded-full bg-primary px-3 py-1 text-xs font-medium text-primary-foreground"
+                  : "rounded-full border border-border bg-background px-3 py-1 text-xs text-muted-foreground"
+              }
+            >
+              {c}
+            </span>
+          );
+        })}
+      </div>
+    </div>
   );
 }
 
