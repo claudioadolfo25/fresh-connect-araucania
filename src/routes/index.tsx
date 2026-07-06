@@ -227,7 +227,10 @@ function Index() {
       <Nav />
       <Hero />
       <Challenge />
+      <Servicio />
       <Catalogo />
+      <Picados />
+      <SectoresTemuco />
       <QRCard />
       <Coverage />
       <Testimonials />
@@ -252,7 +255,9 @@ function Nav() {
           </span>
         </a>
         <nav className="hidden gap-6 md:flex text-sm text-muted-foreground">
+          <a href="#servicio" className="hover:text-primary">Servicio</a>
           <a href="#catalogo" className="hover:text-primary">Catálogo</a>
+          <a href="#picados" className="hover:text-primary">Picados</a>
           <a href="#cobertura" className="hover:text-primary">Cobertura</a>
           <a href="#testimonios" className="hover:text-primary">Testimonios</a>
           <a href="#cotizar" className="hover:text-primary">Cotizar</a>
