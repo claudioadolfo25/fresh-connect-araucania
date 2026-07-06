@@ -98,6 +98,95 @@ const CATALOGO: Producto[] = [
   },
 ];
 
+// Productos adicionales del catálogo (ficha resumida)
+type ProductoResumen = {
+  id: string;
+  name: string;
+  emoji: string;
+  variedad: string;
+  presentacion: string;
+};
+const CATALOGO_EXTRA: ProductoResumen[] = [
+  { id: "ajo", name: "Ajo", emoji: "🧄", variedad: "Morado · Blanco", presentacion: "Malla 500 g · 1 kg · 5 kg" },
+  { id: "cebolla", name: "Cebolla", emoji: "🧅", variedad: "Temprana · Tardía", presentacion: "Malla · Granel · Caja 20 kg" },
+  { id: "zanahoria", name: "Zanahoria", emoji: "🥕", variedad: "Nantes · Chantenay", presentacion: "Caja 10 kg · 20 kg · Granel" },
+  { id: "morron", name: "Morrón", emoji: "🫑", variedad: "Rojo · Verde · Amarillo", presentacion: "Caja 8 kg · 12 kg" },
+];
+
+// Productos picados / procesados
+const PICADOS = [
+  {
+    id: "palta-picada",
+    emoji: "🥑",
+    name: "Palta Picada",
+    subtitle: "Cubos · Rodajas · Puré",
+    tags: ["Cubos 1x1 cm", "Rodajas", "Puré"],
+    presentacion: "Bandeja termosellada · Bolsa al vacío",
+  },
+  {
+    id: "cebolla-picada",
+    emoji: "🧅",
+    name: "Cebolla Picada",
+    subtitle: "Fina · Gruesa · Juliana",
+    tags: ["Picada fina", "Juliana", "Aros"],
+    presentacion: "Bolsa 1 kg · 5 kg · Granel",
+  },
+  {
+    id: "mix",
+    emoji: "🥗",
+    name: "Mezclas Preparadas",
+    subtitle: "Guacamole · Sofrito · Wok",
+    tags: ["Guacamole", "Sofrito", "Mix Wok"],
+    presentacion: "Bandeja · Bolsa · Pack a medida",
+  },
+];
+
+// Sectores urbanos y periurbanos de Temuco con despacho frecuente
+const SECTORES_TEMUCO = [
+  {
+    nombre: "El Carmen",
+    zona: "Surponiente de Temuco",
+    perfil:
+      "Macrosector con fuerte crecimiento inmobiliario. Funciona como ciudad satélite con supermercados propios y colegios.",
+    acceso: "Acceso por Avenida Pedro de Valdivia",
+  },
+  {
+    nombre: "San Ramón",
+    zona: "Suroeste, camino a Nueva Imperial",
+    perfil:
+      "Zona consolidada como dormitorio, con parcelas de agrado y casas de terrenos amplios más allá de Labranza.",
+    acceso: "Ruta S-40",
+  },
+  {
+    nombre: "Amanecer",
+    zona: "Oeste de Temuco",
+    perfil:
+      "Barrio residencial histórico y de alta densidad, con vida de barrio tradicional y comercio local activo.",
+    acceso: "Cercano a Pedro de Valdivia",
+  },
+  {
+    nombre: "Metrenco",
+    zona: "Sur · Padre Las Casas",
+    perfil:
+      "Alta expansión de condominios y villas hacia la Ruta 5 Sur. Tranquilidad a corta distancia del centro.",
+    acceso: "Acceso directo a la Autopista",
+  },
+  {
+    nombre: "Cajón / Vilcún",
+    zona: "Noreste de Temuco",
+    perfil:
+      "Terrenos más grandes y entorno campestre, ideal para familias que buscan menor congestión.",
+    acceso: "Ruta a Cajón / Cherquenco",
+  },
+  {
+    nombre: "Labranza · Pedro de Valdivia",
+    zona: "Poniente y centro-poniente",
+    perfil:
+      "Zonas de conurbación con alta densidad residencial, bien conectadas al centro y con retail consolidado.",
+    acceso: "Ruta S-30 y ejes urbanos",
+  },
+];
+
 const VCARD = `BEGIN:VCARD
 VERSION:3.0
 N:Ayelef;Claudio;;;
@@ -138,7 +227,10 @@ function Index() {
       <Nav />
       <Hero />
       <Challenge />
+      <Servicio />
       <Catalogo />
+      <Picados />
+      <SectoresTemuco />
       <QRCard />
       <Coverage />
       <Testimonials />
@@ -163,7 +255,9 @@ function Nav() {
           </span>
         </a>
         <nav className="hidden gap-6 md:flex text-sm text-muted-foreground">
+          <a href="#servicio" className="hover:text-primary">Servicio</a>
           <a href="#catalogo" className="hover:text-primary">Catálogo</a>
+          <a href="#picados" className="hover:text-primary">Picados</a>
           <a href="#cobertura" className="hover:text-primary">Cobertura</a>
           <a href="#testimonios" className="hover:text-primary">Testimonios</a>
           <a href="#cotizar" className="hover:text-primary">Cotizar</a>
@@ -388,6 +482,224 @@ function Catalogo() {
         Catálogo inicial: palta Hass, tomate y limón. Cebolla, ajo y otros productos frescos
         disponibles bajo pedido.
       </p>
+
+      <div className="mt-10">
+        <div className="mb-4 text-xs uppercase tracking-widest text-muted-foreground">
+          También en catálogo
+        </div>
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          {CATALOGO_EXTRA.map((p) => (
+            <div
+              key={p.id}
+              className="rounded-2xl border border-border bg-card p-5 transition hover:border-primary/40 hover:shadow-sm"
+            >
+              <div className="grid h-24 place-items-center rounded-xl bg-secondary text-5xl">
+                <span aria-hidden>{p.emoji}</span>
+              </div>
+              <h4 className="mt-3 text-base font-semibold">{p.name}</h4>
+              <p className="mt-1 text-xs text-muted-foreground">
+                Variedad: {p.variedad}
+              </p>
+              <p className="text-xs text-muted-foreground">
+                Presentación: {p.presentacion}
+              </p>
+              <a
+                href="#cotizar"
+                className="mt-3 inline-flex text-xs font-medium text-[color:var(--primary-deep)] hover:underline"
+              >
+                Ver ficha técnica →
+              </a>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function Servicio() {
+  return (
+    <section
+      id="servicio"
+      className="relative overflow-hidden"
+      style={{
+        background:
+          "linear-gradient(135deg, oklch(0.96 0.04 150) 0%, oklch(0.93 0.06 150) 100%)",
+      }}
+    >
+      <div className="mx-auto max-w-6xl px-5 py-20">
+        <div className="text-center">
+          <span className="inline-block rounded-full bg-primary px-4 py-1 text-xs font-semibold uppercase tracking-widest text-primary-foreground">
+            Nuestro sello
+          </span>
+          <h2 className="mt-4 text-3xl font-semibold tracking-tight md:text-4xl">
+            No vendemos productos,{" "}
+            <span className="text-[color:var(--primary-deep)]">
+              ofrecemos un servicio de compras de productos frescos
+            </span>
+            .
+          </h2>
+          <p className="mx-auto mt-4 max-w-2xl text-sm text-muted-foreground">
+            Nos hacemos cargo de tu abastecimiento completo. Tú te enfocas en tu negocio;
+            nosotros en la logística, la calidad y la consistencia de tus insumos.
+          </p>
+        </div>
+
+        <div className="mt-10 grid gap-5 md:grid-cols-3">
+          <ServicioCard
+            title="Abastecimiento integral"
+            desc="Gestionamos toda tu compra de productos frescos. Un solo pedido, una sola factura, un solo interlocutor."
+            icon="📦"
+          />
+          <ServicioCard
+            title="Plan de seguimiento 5 contactos"
+            desc="Prospección activa y estructurada en los días 1, 7, 14, 21 y 30. Construimos relaciones, no transacciones."
+            icon="🎯"
+            highlight
+          />
+          <ServicioCard
+            title="Relación de confianza"
+            desc="Excelencia con alma: calidad garantizada, cumplimiento impecable y atención personalizada."
+            icon="🤝"
+          />
+          <ServicioCard
+            title="Despacho fin de semana"
+            desc="Por volumen, coordinamos entregas sábado y domingo directo a tu local, restaurante u hotel."
+            icon="🚚"
+          />
+          <ServicioCard
+            title="Productos procesados"
+            desc="Palta y cebolla picadas, mezclas preparadas y pack a medida para agilizar tu cocina."
+            icon="🔪"
+          />
+          <ServicioCard
+            title="Hub agro con logística integral"
+            desc="Desde Temuco, capital regional, hacia toda La Araucanía con cadena de frío controlada."
+            icon="🏭"
+          />
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function ServicioCard({
+  title,
+  desc,
+  icon,
+  highlight,
+}: {
+  title: string;
+  desc: string;
+  icon: string;
+  highlight?: boolean;
+}) {
+  return (
+    <div
+      className={
+        "rounded-2xl bg-card p-6 shadow-sm " +
+        (highlight ? "border-2 border-primary" : "border border-border")
+      }
+    >
+      <div className="text-3xl" aria-hidden>
+        {icon}
+      </div>
+      <div className="mt-3 text-base font-semibold">{title}</div>
+      <p className="mt-2 text-sm text-muted-foreground">{desc}</p>
+    </div>
+  );
+}
+
+function Picados() {
+  return (
+    <section id="picados" className="mx-auto max-w-6xl px-5 py-16">
+      <div className="mb-8 text-center">
+        <div className="text-xs uppercase tracking-widest text-muted-foreground">
+          加工 · Productos procesados
+        </div>
+        <h2 className="mt-2 text-3xl font-semibold tracking-tight md:text-4xl">
+          Productos picados · Listo para usar
+        </h2>
+        <p className="mx-auto mt-3 max-w-2xl text-sm text-muted-foreground">
+          Ahorra tiempo en tu cocina. Entregamos productos frescos ya procesados, en formatos
+          adaptados a tu operación de retail u HORECA.
+        </p>
+      </div>
+
+      <div className="grid gap-5 md:grid-cols-3">
+        {PICADOS.map((p) => (
+          <div
+            key={p.id}
+            className="rounded-2xl border border-border bg-card p-6 text-center transition hover:border-primary/40 hover:shadow-md"
+          >
+            <div className="text-4xl" aria-hidden>
+              {p.emoji}
+            </div>
+            <h3 className="mt-3 text-lg font-semibold">{p.name}</h3>
+            <p className="text-sm text-muted-foreground">{p.subtitle}</p>
+            <div className="mt-3 flex flex-wrap justify-center gap-2">
+              {p.tags.map((t) => (
+                <span
+                  key={t}
+                  className="rounded-full bg-accent px-3 py-1 text-xs text-accent-foreground"
+                >
+                  {t}
+                </span>
+              ))}
+            </div>
+            <p className="mt-4 text-xs text-muted-foreground">
+              Presentación: {p.presentacion}
+            </p>
+          </div>
+        ))}
+      </div>
+
+      <div className="mt-8 text-center">
+        <a
+          href="#cotizar"
+          className="inline-flex items-center rounded-full bg-primary px-8 py-3 text-sm font-medium text-primary-foreground hover:opacity-90"
+        >
+          Solicitar cotización de productos picados →
+        </a>
+      </div>
+    </section>
+  );
+}
+
+function SectoresTemuco() {
+  return (
+    <section className="mx-auto max-w-6xl px-5 py-16">
+      <div className="rounded-3xl border border-border bg-card p-8 md:p-12">
+        <div className="text-xs uppercase tracking-widest text-muted-foreground">
+          都市 · Sectores urbanos de Temuco
+        </div>
+        <h2 className="mt-2 text-3xl font-semibold tracking-tight md:text-4xl">
+          Despacho fino a los sectores de mayor crecimiento
+        </h2>
+        <p className="mt-3 max-w-2xl text-sm text-muted-foreground">
+          Además de las 32 comunas, atendemos los macrosectores de conurbación y expansión de
+          Temuco con rutas dedicadas a retail de barrio, restaurantes y hoteles.
+        </p>
+
+        <div className="mt-8 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+          {SECTORES_TEMUCO.map((s) => (
+            <div
+              key={s.nombre}
+              className="rounded-2xl border border-border bg-background p-5"
+            >
+              <div className="text-xs uppercase tracking-widest text-[color:var(--primary-deep)]">
+                {s.zona}
+              </div>
+              <div className="mt-1 text-base font-semibold">{s.nombre}</div>
+              <p className="mt-2 text-sm text-muted-foreground">{s.perfil}</p>
+              <div className="mt-3 text-xs text-muted-foreground">
+                <span className="font-medium text-foreground">Conectividad: </span>
+                {s.acceso}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
     </section>
   );
 }
