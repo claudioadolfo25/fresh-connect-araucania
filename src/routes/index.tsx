@@ -268,110 +268,154 @@ function Challenge() {
   );
 }
 
-function Simulator() {
-  const [qty, setQty] = useState<Record<string, number>>({});
-
-  const setKg = (id: string, val: number) => {
-    const v = Number.isNaN(val) ? 0 : val;
-    setQty((q) => ({ ...q, [id]: v }));
-  };
-
-  const rows = PRODUCTS.map((p) => {
-    const kg = qty[p.id] ?? 0;
-    return { ...p, kg, subtotal: kg * p.pricePerKg };
-  });
-  const total = rows.reduce((s, r) => s + r.subtotal, 0);
-  const totalKg = rows.reduce((s, r) => s + r.kg, 0);
-  const bigOrder = totalKg > 2000;
+function Catalogo() {
+  const [active, setActive] = useState<string>(CATALOGO[0].id);
+  const producto = CATALOGO.find((p) => p.id === active) ?? CATALOGO[0];
 
   return (
-    <section id="simulador" className="mx-auto max-w-6xl px-5 py-16">
+    <section id="catalogo" className="mx-auto max-w-6xl px-5 py-16">
       <div className="mb-8">
         <div className="text-xs uppercase tracking-widest text-muted-foreground">
-          算 · Simulador
+          品 · Catálogo
         </div>
         <h2 className="mt-2 text-3xl font-semibold tracking-tight md:text-4xl">
-          Estimación instantánea de tu pedido
+          Productos frescos, con ficha técnica clara
         </h2>
         <p className="mt-2 max-w-2xl text-sm text-muted-foreground">
-          Ingresa los kilos por producto y visualiza tu estimación en tiempo real. El precio
-          final se confirma contigo antes de despachar.
+          Cada producto llega documentado: variedad, calibre, origen, temporada y presentación.
+          Sin sorpresas para tu equipo de compras ni para tu chef.
         </p>
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-[1fr,380px]">
-        <div className="rounded-2xl border border-border bg-card p-4 md:p-6">
-          <div className="hidden grid-cols-[1.4fr,1fr,1fr,1fr] gap-4 px-3 pb-3 text-xs uppercase tracking-widest text-muted-foreground md:grid">
-            <span>Producto</span>
-            <span>Precio / kg</span>
-            <span>Cantidad (kg)</span>
-            <span className="text-right">Subtotal</span>
-          </div>
-          <div className="divide-y divide-border">
-            {rows.map((p) => (
-              <div
-                key={p.id}
-                className="grid grid-cols-2 items-center gap-3 py-4 md:grid-cols-[1.4fr,1fr,1fr,1fr] md:gap-4"
-              >
-                <div className="col-span-2 flex items-center gap-3 md:col-span-1">
-                  <span className="text-2xl">{p.emoji}</span>
-                  <div>
-                    <div className="font-medium">{p.name}</div>
-                    <div className="text-xs text-muted-foreground">{p.detail}</div>
-                  </div>
-                </div>
-                <div className="text-sm text-muted-foreground md:text-foreground">
-                  {CLP(p.pricePerKg)}
-                </div>
-                <div>
-                  <input
-                    type="number"
-                    min={0}
-                    max={2000}
-                    placeholder="0"
-                    value={qty[p.id] ?? ""}
-                    onChange={(e) => setKg(p.id, parseInt(e.target.value || "0", 10))}
-                    className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm outline-none focus:border-primary"
-                  />
-                  <div className="mt-1 text-[10px] text-muted-foreground">
-                    Mín. 5 · Máx. 2.000 kg
-                  </div>
-                </div>
-                <div className="text-right font-medium tabular-nums">{CLP(p.subtotal)}</div>
+      <div className="mb-6 flex flex-wrap gap-2">
+        {CATALOGO.map((p) => (
+          <button
+            key={p.id}
+            onClick={() => setActive(p.id)}
+            className={
+              active === p.id
+                ? "rounded-full bg-primary px-4 py-1.5 text-xs font-medium text-primary-foreground"
+                : "rounded-full border border-border bg-card px-4 py-1.5 text-xs text-muted-foreground hover:text-primary"
+            }
+          >
+            {p.name}
+          </button>
+        ))}
+      </div>
+
+      <div className="grid gap-6 md:grid-cols-3">
+        {CATALOGO.map((p) => (
+          <article
+            key={p.id}
+            className={
+              "group overflow-hidden rounded-2xl border bg-card transition " +
+              (active === p.id
+                ? "border-primary shadow-md"
+                : "border-border hover:border-primary/40")
+            }
+          >
+            <button
+              onClick={() => setActive(p.id)}
+              className="block w-full text-left"
+            >
+              <div className="aspect-[4/3] overflow-hidden bg-secondary">
+                <img
+                  src={p.image}
+                  alt={p.name}
+                  loading="lazy"
+                  width={1024}
+                  height={1024}
+                  className="h-full w-full object-cover transition group-hover:scale-[1.03]"
+                />
               </div>
-            ))}
+              <div className="p-5">
+                <div className="text-xs uppercase tracking-widest text-[color:var(--primary-deep)]">
+                  Ficha
+                </div>
+                <div className="mt-1 text-lg font-semibold">{p.name}</div>
+                <p className="mt-1 text-sm text-muted-foreground">{p.tagline}</p>
+              </div>
+            </button>
+          </article>
+        ))}
+      </div>
+
+      <div className="mt-8 grid gap-6 rounded-3xl border border-border bg-card p-6 md:grid-cols-[1.1fr,1fr] md:p-10">
+        <div>
+          <div className="text-xs uppercase tracking-widest text-muted-foreground">
+            Ficha técnica
           </div>
+          <h3 className="mt-2 text-2xl font-semibold">{producto.name}</h3>
+          <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
+            {producto.description}
+          </p>
+
+          <div className="mt-6 grid gap-4 sm:grid-cols-2">
+            <SpecBlock label="Variedades" items={producto.variedades} />
+            <SpecBlock label="Calibres" items={producto.calibres} />
+          </div>
+
+          <dl className="mt-6 grid gap-3 text-sm">
+            <SpecRow k="Origen" v={producto.origen} />
+            <SpecRow k="Temporada" v={producto.temporada} />
+            <SpecRow k="Presentación" v={producto.presentacion} />
+          </dl>
         </div>
 
         <aside className="rounded-2xl border border-primary/20 bg-primary p-6 text-primary-foreground">
-          <div className="text-xs uppercase tracking-widest opacity-80">Total estimado</div>
-          <div className="mt-2 text-4xl font-semibold tabular-nums">{CLP(total)}</div>
-          <div className="mt-1 text-sm opacity-80">{totalKg.toLocaleString("es-CL")} kg totales</div>
-
-          <p className="mt-4 rounded-lg bg-black/15 px-3 py-2 text-xs leading-relaxed opacity-95">
-            Estimación referencial — el precio final se confirma directamente contigo antes de
-            despachar.
-          </p>
-          <p className="mt-2 text-[11px] opacity-70">
-            Precios sujetos a variación según temporada y disponibilidad.
-          </p>
-
-          {bigOrder && (
-            <div className="mt-4 rounded-lg border border-white/25 bg-white/10 p-3 text-xs">
-              📦 <strong>¿Más de 2.000 kg?</strong> Gestionamos contratos especiales para grandes
-              volúmenes. Te contactamos en 24 hrs.
-            </div>
-          )}
-
+          <div className="text-xs uppercase tracking-widest opacity-80">
+            Proceso productivo
+          </div>
+          <div className="mt-2 text-lg font-semibold">Trazabilidad y calidad</div>
+          <ul className="mt-4 space-y-3 text-sm">
+            {producto.atributos.map((a) => (
+              <li key={a.k} className="flex flex-col gap-0.5 border-b border-white/15 pb-3 last:border-none last:pb-0">
+                <span className="text-[11px] uppercase tracking-widest opacity-75">{a.k}</span>
+                <span className="font-medium">{a.v}</span>
+              </li>
+            ))}
+          </ul>
           <a
             href="#cotizar"
-            className="mt-5 inline-flex w-full items-center justify-center rounded-full bg-background px-4 py-3 text-sm font-medium text-primary hover:opacity-90"
+            className="mt-6 inline-flex w-full items-center justify-center rounded-full bg-background px-4 py-3 text-sm font-medium text-primary hover:opacity-90"
           >
-            Convertir en cotización formal →
+            Cotizar {producto.name} →
           </a>
         </aside>
       </div>
+
+      <p className="mt-4 text-xs text-muted-foreground">
+        Catálogo inicial: palta Hass, tomate y limón. Cebolla, ajo y otros productos frescos
+        disponibles bajo pedido.
+      </p>
     </section>
+  );
+}
+
+function SpecBlock({ label, items }: { label: string; items: string[] }) {
+  return (
+    <div>
+      <div className="mb-2 text-xs uppercase tracking-widest text-muted-foreground">{label}</div>
+      <div className="flex flex-wrap gap-1.5">
+        {items.map((i) => (
+          <span
+            key={i}
+            className="rounded-full border border-border bg-background px-2.5 py-1 text-xs"
+          >
+            {i}
+          </span>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function SpecRow({ k, v }: { k: string; v: string }) {
+  return (
+    <div className="flex flex-col gap-0.5 border-b border-border/60 pb-3 last:border-none last:pb-0 sm:flex-row sm:items-baseline sm:justify-between sm:gap-6">
+      <dt className="text-xs uppercase tracking-widest text-muted-foreground">{k}</dt>
+      <dd className="text-sm text-foreground sm:text-right">{v}</dd>
+    </div>
   );
 }
 
