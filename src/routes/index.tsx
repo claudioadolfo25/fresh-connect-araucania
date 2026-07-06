@@ -98,6 +98,95 @@ const CATALOGO: Producto[] = [
   },
 ];
 
+// Productos adicionales del catálogo (ficha resumida)
+type ProductoResumen = {
+  id: string;
+  name: string;
+  emoji: string;
+  variedad: string;
+  presentacion: string;
+};
+const CATALOGO_EXTRA: ProductoResumen[] = [
+  { id: "ajo", name: "Ajo", emoji: "🧄", variedad: "Morado · Blanco", presentacion: "Malla 500 g · 1 kg · 5 kg" },
+  { id: "cebolla", name: "Cebolla", emoji: "🧅", variedad: "Temprana · Tardía", presentacion: "Malla · Granel · Caja 20 kg" },
+  { id: "zanahoria", name: "Zanahoria", emoji: "🥕", variedad: "Nantes · Chantenay", presentacion: "Caja 10 kg · 20 kg · Granel" },
+  { id: "morron", name: "Morrón", emoji: "🫑", variedad: "Rojo · Verde · Amarillo", presentacion: "Caja 8 kg · 12 kg" },
+];
+
+// Productos picados / procesados
+const PICADOS = [
+  {
+    id: "palta-picada",
+    emoji: "🥑",
+    name: "Palta Picada",
+    subtitle: "Cubos · Rodajas · Puré",
+    tags: ["Cubos 1x1 cm", "Rodajas", "Puré"],
+    presentacion: "Bandeja termosellada · Bolsa al vacío",
+  },
+  {
+    id: "cebolla-picada",
+    emoji: "🧅",
+    name: "Cebolla Picada",
+    subtitle: "Fina · Gruesa · Juliana",
+    tags: ["Picada fina", "Juliana", "Aros"],
+    presentacion: "Bolsa 1 kg · 5 kg · Granel",
+  },
+  {
+    id: "mix",
+    emoji: "🥗",
+    name: "Mezclas Preparadas",
+    subtitle: "Guacamole · Sofrito · Wok",
+    tags: ["Guacamole", "Sofrito", "Mix Wok"],
+    presentacion: "Bandeja · Bolsa · Pack a medida",
+  },
+];
+
+// Sectores urbanos y periurbanos de Temuco con despacho frecuente
+const SECTORES_TEMUCO = [
+  {
+    nombre: "El Carmen",
+    zona: "Surponiente de Temuco",
+    perfil:
+      "Macrosector con fuerte crecimiento inmobiliario. Funciona como ciudad satélite con supermercados propios y colegios.",
+    acceso: "Acceso por Avenida Pedro de Valdivia",
+  },
+  {
+    nombre: "San Ramón",
+    zona: "Suroeste, camino a Nueva Imperial",
+    perfil:
+      "Zona consolidada como dormitorio, con parcelas de agrado y casas de terrenos amplios más allá de Labranza.",
+    acceso: "Ruta S-40",
+  },
+  {
+    nombre: "Amanecer",
+    zona: "Oeste de Temuco",
+    perfil:
+      "Barrio residencial histórico y de alta densidad, con vida de barrio tradicional y comercio local activo.",
+    acceso: "Cercano a Pedro de Valdivia",
+  },
+  {
+    nombre: "Metrenco",
+    zona: "Sur · Padre Las Casas",
+    perfil:
+      "Alta expansión de condominios y villas hacia la Ruta 5 Sur. Tranquilidad a corta distancia del centro.",
+    acceso: "Acceso directo a la Autopista",
+  },
+  {
+    nombre: "Cajón / Vilcún",
+    zona: "Noreste de Temuco",
+    perfil:
+      "Terrenos más grandes y entorno campestre, ideal para familias que buscan menor congestión.",
+    acceso: "Ruta a Cajón / Cherquenco",
+  },
+  {
+    nombre: "Labranza · Pedro de Valdivia",
+    zona: "Poniente y centro-poniente",
+    perfil:
+      "Zonas de conurbación con alta densidad residencial, bien conectadas al centro y con retail consolidado.",
+    acceso: "Ruta S-30 y ejes urbanos",
+  },
+];
+
 const VCARD = `BEGIN:VCARD
 VERSION:3.0
 N:Ayelef;Claudio;;;
