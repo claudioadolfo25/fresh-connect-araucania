@@ -2,6 +2,9 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { QRCodeSVG } from "qrcode.react";
 import claudioSupermercado from "@/assets/claudio-supermercado.jpg";
+import productoPalta from "@/assets/producto-palta.jpg";
+import productoTomate from "@/assets/producto-tomate.jpg";
+import productoLimon from "@/assets/producto-limon.jpg";
 
 export const Route = createFileRoute("/")({
   component: Index,
@@ -21,13 +24,78 @@ const QUOTE_WEBHOOK_URL =
   (typeof import.meta !== "undefined" && (import.meta as any).env?.VITE_QUOTE_WEBHOOK_URL) ||
   "";
 
-// Reference prices in CLP per kg — easy to edit
-const PRODUCTS: { id: string; name: string; pricePerKg: number; emoji: string; detail: string }[] = [
-  { id: "palta", name: "Palta Hass", pricePerKg: 2500, emoji: "🥑", detail: "Calibre 12–32" },
-  { id: "tomate", name: "Tomate Primera", pricePerKg: 1800, emoji: "🍅", detail: "Valle de Quillota" },
-  { id: "limon", name: "Limón Messina", pricePerKg: 1200, emoji: "🍋", detail: "Pulpa jugosa" },
-  { id: "cebolla", name: "Cebolla Granel", pricePerKg: 900, emoji: "🧅", detail: "60–70 mm" },
-  { id: "ajo", name: "Ajo", pricePerKg: 3000, emoji: "🧄", detail: "Cabeza superior" },
+// Catálogo de productos frescos — inicial: palta, tomate, limón
+type Producto = {
+  id: string;
+  name: string;
+  image: string;
+  tagline: string;
+  description: string;
+  variedades: string[];
+  calibres: string[];
+  origen: string;
+  temporada: string;
+  presentacion: string;
+  atributos: { k: string; v: string }[];
+};
+const CATALOGO: Producto[] = [
+  {
+    id: "palta",
+    name: "Palta Hass",
+    image: productoPalta,
+    tagline: "El estándar de exportación, disponible en La Araucanía.",
+    description:
+      "Palta Hass de piel rugosa y pulpa cremosa, con alto contenido de aceite. Seleccionada en huerto y madurada bajo control para llegar en su punto óptimo a retail y HORECA.",
+    variedades: ["Hass"],
+    calibres: ["12", "14", "16", "18", "20", "22", "24", "26", "28", "30", "32"],
+    origen: "Región de Valparaíso · Región Metropolitana",
+    temporada: "Disponibilidad todo el año (peak: sep–mar)",
+    presentacion: "Caja de 10 kg · Bin 400 kg · Granel a pedido",
+    atributos: [
+      { k: "Materia seca", v: "≥ 23%" },
+      { k: "Estado de madurez", v: "Verde firme · Consumo inmediato" },
+      { k: "Cadena de frío", v: "5–7 °C en transporte" },
+      { k: "Trazabilidad", v: "Por lote y huerto de origen" },
+    ],
+  },
+  {
+    id: "tomate",
+    name: "Tomate Larga Vida",
+    image: productoTomate,
+    tagline: "Firmeza, color y consistencia en cada caja.",
+    description:
+      "Tomate de larga vida útil postcosecha, ideal para retail de rotación y para operaciones HORECA que exigen presentación uniforme y buen rendimiento en corte.",
+    variedades: ["Larga Vida", "Roma / Perita", "Cherry en racimo"],
+    calibres: ["GG (82–102 mm)", "G (67–82 mm)", "M (57–67 mm)", "P (47–57 mm)"],
+    origen: "Valle de Quillota · Región del Maule",
+    temporada: "Todo el año (peak: nov–abr)",
+    presentacion: "Caja de 10 kg · Bandeja 5 kg · Racimo en caja de 6 kg",
+    atributos: [
+      { k: "Grado Brix", v: "4.5° – 5.5°" },
+      { k: "Color (escala USDA)", v: "5–6 al despacho" },
+      { k: "Cadena de frío", v: "10–12 °C" },
+      { k: "Vida útil", v: "10–14 días en góndola" },
+    ],
+  },
+  {
+    id: "limon",
+    name: "Limón Sutil / Eureka",
+    image: productoLimon,
+    tagline: "Aroma, acidez y rendimiento de jugo garantizados.",
+    description:
+      "Limón de cáscara pareja y alto contenido de jugo. Selección para bar, cocina de restaurante y góndola de supermercado, con calibre uniforme para presentación premium.",
+    variedades: ["Eureka", "Fino / Génova", "Sutil (Pica)"],
+    calibres: ["70", "75", "90", "100", "110", "125", "140"],
+    origen: "Región de Coquimbo · Valle del Limarí",
+    temporada: "Todo el año (peak: abr–oct)",
+    presentacion: "Caja de 10 kg · Malla 2 kg · Granel 20 kg",
+    atributos: [
+      { k: "Contenido de jugo", v: "≥ 35%" },
+      { k: "Acidez cítrica", v: "5–7% ac. cítrico" },
+      { k: "Cadena de frío", v: "8–10 °C" },
+      { k: "Presentación", v: "Cáscara amarilla uniforme sin manchas" },
+    ],
+  },
 ];
 
 const VCARD = `BEGIN:VCARD
@@ -70,7 +138,7 @@ function Index() {
       <Nav />
       <Hero />
       <Challenge />
-      <Simulator />
+      <Catalogo />
       <QRCard />
       <Coverage />
       <Testimonials />
@@ -95,7 +163,7 @@ function Nav() {
           </span>
         </a>
         <nav className="hidden gap-6 md:flex text-sm text-muted-foreground">
-          <a href="#simulador" className="hover:text-primary">Simulador</a>
+          <a href="#catalogo" className="hover:text-primary">Catálogo</a>
           <a href="#cobertura" className="hover:text-primary">Cobertura</a>
           <a href="#testimonios" className="hover:text-primary">Testimonios</a>
           <a href="#cotizar" className="hover:text-primary">Cotizar</a>
@@ -129,21 +197,22 @@ function Hero() {
           En alianza con PEPEPALTA.CL · Región de La Araucanía
         </div>
         <h1 className="max-w-4xl text-4xl font-semibold leading-[1.1] tracking-tight md:text-6xl">
-          Abastecimiento estratégico de{" "}
-          <span className="text-[color:var(--primary-deep)]">productos frescos</span> para
-          Retail y Horeca en La Araucanía.
+          El primer hub agro con{" "}
+          <span className="text-[color:var(--primary-deep)]">logística integral</span> de productos frescos para La Araucanía.
         </h1>
         <p className="mt-6 max-w-2xl text-lg text-muted-foreground">
-          En alianza con <strong className="text-foreground">PEPEPALTA.CL</strong>, Claudio Ayelef
-          gestiona tu suministro de paltas, tomates, limones, cebollas y ajos con calidad y
-          continuidad garantizadas.
+          Soy <strong className="text-foreground">Claudio Ayelef</strong>, Key Account Manager que
+          representa al primer hub agro especialista en distribución de productos frescos con
+          logística integral desde <strong className="text-foreground">Temuco</strong>, capital
+          de la Región, hacia toda La Araucanía. Un solo interlocutor para retail, HORECA y
+          exportadores.
         </p>
         <div className="mt-8 flex flex-wrap gap-3">
           <a
-            href="#simulador"
+            href="#catalogo"
             className="inline-flex items-center rounded-full bg-primary px-6 py-3 text-sm font-medium text-primary-foreground shadow-sm hover:opacity-90"
           >
-            Simular mi pedido ahora →
+            Ver catálogo de productos →
           </a>
           <a
             href={WHATSAPP_URL}
@@ -155,8 +224,8 @@ function Hero() {
           </a>
         </div>
         <div className="mt-10 flex flex-wrap gap-3 text-xs">
-          <Badge>En Alianza con PEPEPALTA.CL</Badge>
-          <Badge>Precios actualizados: {todayEs()}</Badge>
+          <Badge>Primer hub agro de La Araucanía</Badge>
+          <Badge>Logística integral desde Temuco · {todayEs()}</Badge>
           <Badge>Respuesta en menos de 2 horas hábiles</Badge>
         </div>
       </div>
