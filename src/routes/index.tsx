@@ -1314,6 +1314,167 @@ function SelectField({
   );
 }
 
+function Simulador() {
+  const [qty, setQty] = useState<Record<string, number>>({});
+
+  const setValue = (id: string, v: number) => {
+    setQty((prev) => ({ ...prev, [id]: v < 0 ? 0 : v }));
+  };
+
+  const total = useMemo(
+    () =>
+      CATALOGO.reduce(
+        (sum, p) => sum + (qty[p.id] || 0) * p.precio,
+        0,
+      ),
+    [qty],
+  );
+
+  const seleccionados = CATALOGO.filter((p) => (qty[p.id] || 0) > 0);
+
+  const wsMessage =
+    seleccionados.length > 0
+      ? `Hola Claudio, quiero cotizar: ${seleccionados
+          .map((p) => `${qty[p.id]} ${p.unidad}(s) de ${p.name}`)
+          .join(", ")}. Total estimado: ${CLP(total)}.`
+      : "Hola Claudio, me interesa cotizar productos frescos.";
+  const wsUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(wsMessage)}`;
+
+  return (
+    <section id="simulador" className="mx-auto max-w-6xl px-5 py-16">
+      <div className="rounded-3xl border border-border bg-card p-6 md:p-10">
+        <div className="mb-8">
+          <div className="text-xs uppercase tracking-widest text-muted-foreground">
+            見積 · Simulador
+          </div>
+          <h2 className="mt-2 text-3xl font-semibold tracking-tight md:text-4xl">
+            Simulador de cotización
+          </h2>
+          <p className="mt-2 max-w-2xl text-sm text-muted-foreground">
+            Ingresa la cantidad requerida por producto y visualiza el total estimado. Los
+            precios son referenciales por{" "}
+            <strong className="text-foreground">unidad indicada</strong> y pueden variar según
+            temporada y volumen.
+          </p>
+        </div>
+
+        <div className="grid gap-3">
+          {CATALOGO.map((p) => {
+            const q = qty[p.id] || 0;
+            const subtotal = q * p.precio;
+            return (
+              <div
+                key={p.id}
+                className="grid grid-cols-1 gap-3 rounded-2xl border border-border bg-background p-4 sm:grid-cols-[1fr,auto,auto,auto] sm:items-center"
+              >
+                <div>
+                  <div className="text-sm font-semibold">{p.name}</div>
+                  <div className="text-xs text-muted-foreground">
+                    {CLP(p.precio)} por {p.unidad}
+                  </div>
+                </div>
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setValue(p.id, q - 1)}
+                    className="h-8 w-8 rounded-full border border-border text-lg leading-none hover:bg-secondary"
+                    aria-label={`Menos ${p.name}`}
+                  >
+                    −
+                  </button>
+                  <input
+                    type="number"
+                    min={0}
+                    value={q}
+                    onChange={(e) =>
+                      setValue(p.id, parseInt(e.target.value || "0", 10) || 0)
+                    }
+                    className="h-9 w-20 rounded-lg border border-border bg-background px-2 text-center text-sm outline-none focus:border-primary"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setValue(p.id, q + 1)}
+                    className="h-8 w-8 rounded-full border border-border text-lg leading-none hover:bg-secondary"
+                    aria-label={`Más ${p.name}`}
+                  >
+                    +
+                  </button>
+                </div>
+                <div className="text-xs text-muted-foreground sm:text-right">
+                  {p.unidad}
+                </div>
+                <div className="text-sm font-semibold sm:text-right sm:min-w-[100px]">
+                  {CLP(subtotal)}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+
+        <div className="mt-6 flex flex-col gap-4 rounded-2xl border border-primary/20 bg-primary p-6 text-primary-foreground sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <div className="text-xs uppercase tracking-widest opacity-80">Total estimado</div>
+            <div className="mt-1 text-3xl font-semibold">{CLP(total)}</div>
+            <div className="mt-1 text-xs opacity-80">
+              Referencial. IVA, despacho y descuentos por volumen se cotizan al confirmar.
+            </div>
+          </div>
+          <div className="flex flex-wrap gap-3">
+            <a
+              href={wsUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center rounded-full bg-background px-5 py-2.5 text-sm font-medium text-primary hover:opacity-90"
+            >
+              Enviar por WhatsApp →
+            </a>
+            <a
+              href="#cotizar"
+              className="inline-flex items-center rounded-full border border-primary-foreground/40 px-5 py-2.5 text-sm font-medium hover:bg-primary-foreground/10"
+            >
+              Cotización formal
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function Rubros() {
+  return (
+    <section id="rubros" className="mx-auto max-w-6xl px-5 py-16">
+      <div className="mb-8 text-center">
+        <div className="text-xs uppercase tracking-widest text-muted-foreground">
+          業種 · Para tu negocio
+        </div>
+        <h2 className="mt-2 text-3xl font-semibold tracking-tight md:text-4xl">
+          Abastecemos todo tipo de cocinas
+        </h2>
+        <p className="mx-auto mt-3 max-w-2xl text-sm text-muted-foreground">
+          De un local de barrio a una operación de banquetería: adaptamos el servicio a tu
+          rubro, tu volumen y tu ritmo de reposición.
+        </p>
+      </div>
+
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        {RUBROS_CARDS.map((r) => (
+          <div
+            key={r.name}
+            className="rounded-2xl border border-border bg-card p-6 transition hover:border-primary/40 hover:shadow-sm"
+          >
+            <div className="text-3xl" aria-hidden>
+              {r.icon}
+            </div>
+            <h3 className="mt-3 text-lg font-semibold">{r.name}</h3>
+            <p className="mt-2 text-sm text-muted-foreground">{r.desc}</p>
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+}
+
 const TRUST = [
   { t: "Respaldo PMA SpA", d: "Primer hub agro de La Araucanía, especialista en distribución de productos frescos." },
   { t: "Logística integral", d: "Desde Temuco hacia toda La Araucanía con entregas confiables." },
