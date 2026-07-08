@@ -1152,14 +1152,17 @@ function QuoteForm() {
 
     setStatus("sending");
     try {
-      if (QUOTE_WEBHOOK_URL) {
-        const res = await fetch(QUOTE_WEBHOOK_URL, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ ...data, submittedAt: new Date().toISOString() }),
-        });
-        if (!res.ok) throw new Error("Webhook error");
-      }
+      const { error } = await supabase.from("quote_requests").insert({
+        rut: String(data.rut || ""),
+        nombre: String(data.nombre || ""),
+        rubro: String(data.rubro || ""),
+        email,
+        telefono: String(data.telefono || ""),
+        comuna: String(data.comuna || ""),
+        volumen: String(data.volumen || ""),
+        mensaje: String(data.mensaje || "") || null,
+      });
+      if (error) throw error;
       setStatus("ok");
       form.reset();
     } catch {
@@ -1312,8 +1315,8 @@ function SelectField({
 }
 
 const TRUST = [
-  { t: "Alianza con PEPEPALTA.CL", d: "Respaldo de un distribuidor consolidado de productos frescos." },
-  { t: "Cadena de frío garantizada", d: "Logística con temperatura controlada en toda La Araucanía." },
+  { t: "Respaldo PMA SpA", d: "Primer hub agro de La Araucanía, especialista en distribución de productos frescos." },
+  { t: "Logística integral", d: "Desde Temuco hacia toda La Araucanía con entregas confiables." },
   { t: "Atención personalizada", d: "Un solo interlocutor: Claudio Ayelef, Key Account Manager." },
   { t: "Resolución inmediata", d: "¿Un pedido con problemas? Lo resolvemos sin vueltas." },
   { t: "Privacidad respetada", d: "Tus datos se usan solo para tu cotización. Nunca con terceros." },
@@ -1351,7 +1354,7 @@ function Footer() {
               <span className="grid h-9 w-9 place-items-center rounded-full bg-primary text-primary-foreground text-sm font-semibold">絆</span>
               <div>
                 <div className="text-sm font-semibold">Claudio Ayelef</div>
-                <div className="text-xs text-muted-foreground">Key Account Manager · PEPEPALTA.CL</div>
+                <div className="text-xs text-muted-foreground">Key Account Manager · PMA SpA</div>
               </div>
             </div>
             <p className="mt-4 max-w-sm text-xs text-muted-foreground">
