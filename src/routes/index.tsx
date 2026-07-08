@@ -332,7 +332,7 @@ const VCARD = `BEGIN:VCARD
 VERSION:3.0
 N:Ayelef;Claudio;;;
 FN:Claudio Ayelef
-ORG:PEPEPALTA.CL
+ORG:PMA SpA
 TITLE:Key Account Manager
 TEL;TYPE=CELL:+56935179017
 EMAIL:key@co-kizuna.com
@@ -356,6 +356,16 @@ const ALL_COMUNAS = [...CAUTIN, ...MALLECO];
 const RUBROS = ["Supermercado", "Restaurante", "Hotel", "Casino", "Cafetería", "Juguería", "Otro"];
 const VOLUMES = ["<100 kg", "100–500 kg", "500–1.000 kg", ">1.000 kg"];
 
+// Rubros que atiende PMA SpA
+const RUBROS_CARDS = [
+  { icon: "🍽️", name: "Restaurantes", desc: "Paltas por calibre, verduras frescas y reposición semanal confiable." },
+  { icon: "🏭", name: "Casinos", desc: "Volúmenes grandes con precio estable y entrega programada." },
+  { icon: "🏨", name: "Hoteles", desc: "Fruta y verdura seleccionada para desayunos y banquetería." },
+  { icon: "🛒", name: "Minimarkets", desc: "Productos listos para reventa con buen margen y rotación." },
+  { icon: "☕", name: "Cafeterías", desc: "Palta lista para tostadas y sándwiches, fruta fresca de temporada." },
+  { icon: "🥤", name: "Juguerías", desc: "Fruta de temporada con el rendimiento que tu negocio necesita." },
+];
+
 const CLP = (n: number) =>
   "$" + n.toLocaleString("es-CL", { maximumFractionDigits: 0 });
 
@@ -371,6 +381,8 @@ function Index() {
       <Servicio />
       <Catalogo />
       <Picados />
+      <Simulador />
+      <Rubros />
       <SectoresTemuco />
       <QRCard />
       <Coverage />
@@ -392,13 +404,15 @@ function Nav() {
           <span className="grid h-9 w-9 place-items-center rounded-full bg-primary text-primary-foreground text-sm font-semibold">絆</span>
           <span className="text-sm">
             <span className="block font-semibold leading-tight">Claudio Ayelef</span>
-            <span className="block text-xs text-muted-foreground leading-tight">Key Account Manager · PEPEPALTA.CL</span>
+            <span className="block text-xs text-muted-foreground leading-tight">Key Account Manager · PMA SpA</span>
           </span>
         </a>
         <nav className="hidden gap-6 md:flex text-sm text-muted-foreground">
           <a href="#servicio" className="hover:text-primary">Servicio</a>
           <a href="#catalogo" className="hover:text-primary">Catálogo</a>
           <a href="#picados" className="hover:text-primary">Picados</a>
+          <a href="#simulador" className="hover:text-primary">Simulador</a>
+          <a href="#rubros" className="hover:text-primary">Rubros</a>
           <a href="#cobertura" className="hover:text-primary">Cobertura</a>
           <a href="#testimonios" className="hover:text-primary">Testimonios</a>
           <a href="#cotizar" className="hover:text-primary">Cotizar</a>
@@ -429,7 +443,7 @@ function Hero() {
       <div className="mx-auto max-w-6xl px-5 py-20 md:py-28">
         <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-border bg-card px-3 py-1 text-xs text-muted-foreground">
           <span className="h-2 w-2 rounded-full bg-[color:var(--accent-fresh)]" />
-          En alianza con PEPEPALTA.CL · Región de La Araucanía
+          PMA SpA · Región de La Araucanía
         </div>
         <h1 className="max-w-4xl text-4xl font-semibold leading-[1.1] tracking-tight md:text-6xl">
           El primer hub agro con{" "}
@@ -494,8 +508,8 @@ function Challenge() {
           <div className="mb-3 text-xs uppercase tracking-widest opacity-80">La solución</div>
           <h3 className="text-xl font-semibold">Cadena de suministro con un solo interlocutor</h3>
           <p className="mt-3 text-sm leading-relaxed opacity-90">
-            Productos seleccionados en origen, logística con cadena de frío y un asesor que
-            responde: frescura garantizada desde el campo hasta tu cocina o góndola.
+            Productos seleccionados en origen, logística integral y un asesor que responde:
+            frescura garantizada desde el campo hasta tu cocina o góndola.
           </p>
         </div>
       </div>
@@ -693,15 +707,10 @@ function Servicio() {
             icon="📦"
           />
           <ServicioCard
-            title="Plan de seguimiento 5 contactos"
-            desc="Prospección activa y estructurada en los días 1, 7, 14, 21 y 30. Construimos relaciones, no transacciones."
-            icon="🎯"
-            highlight
-          />
-          <ServicioCard
             title="Relación de confianza"
             desc="Excelencia con alma: calidad garantizada, cumplimiento impecable y atención personalizada."
             icon="🤝"
+            highlight
           />
           <ServicioCard
             title="Despacho fin de semana"
@@ -715,7 +724,7 @@ function Servicio() {
           />
           <ServicioCard
             title="Hub agro con logística integral"
-            desc="Desde Temuco, capital regional, hacia toda La Araucanía con cadena de frío controlada."
+            desc="Desde Temuco, capital regional, hacia toda La Araucanía con logística confiable."
             icon="🏭"
           />
         </div>
