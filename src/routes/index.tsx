@@ -1,10 +1,11 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { QRCodeSVG } from "qrcode.react";
 import claudioSupermercado from "@/assets/claudio-supermercado.jpg";
 import productoPalta from "@/assets/producto-palta.jpg";
 import productoTomate from "@/assets/producto-tomate.jpg";
 import productoLimon from "@/assets/producto-limon.jpg";
+import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/")({
   component: Index,
@@ -19,16 +20,12 @@ const WHATSAPP_URL = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent
 )}`;
 const CONTACT_EMAIL = "key@co-kizuna.com";
 
-// Webhook endpoint for form submissions — edit here
-const QUOTE_WEBHOOK_URL =
-  (typeof import.meta !== "undefined" && (import.meta as any).env?.VITE_QUOTE_WEBHOOK_URL) ||
-  "";
-
-// Catálogo de productos frescos — inicial: palta, tomate, limón
+// Catálogo de productos frescos con ficha técnica y precio
 type Producto = {
   id: string;
   name: string;
-  image: string;
+  image?: string;
+  emoji?: string;
   tagline: string;
   description: string;
   variedades: string[];
@@ -37,34 +34,57 @@ type Producto = {
   temporada: string;
   presentacion: string;
   atributos: { k: string; v: string }[];
+  precio: number;
+  unidad: string; // "kg", "unidad", "cabeza"
 };
 const CATALOGO: Producto[] = [
   {
-    id: "palta",
-    name: "Palta Hass",
+    id: "palta-16",
+    name: "Palta Hass Calibre 16",
     image: productoPalta,
-    tagline: "El estándar de exportación, disponible en La Araucanía.",
+    tagline: "Calibre premium para retail y HORECA de alto nivel.",
     description:
-      "Palta Hass de piel rugosa y pulpa cremosa, con alto contenido de aceite. Seleccionada en huerto y madurada bajo control para llegar en su punto óptimo a retail y HORECA.",
+      "Palta Hass calibre 16 de gran tamaño (270–300 g por unidad). Pulpa cremosa, alto contenido de aceite, ideal para presentación premium en góndola, tostadas gourmet y platos de autor.",
     variedades: ["Hass"],
-    calibres: ["12", "14", "16", "18", "20", "22", "24", "26", "28", "30", "32"],
+    calibres: ["16 (270–300 g por unidad)"],
     origen: "Región de Valparaíso · Región Metropolitana",
     temporada: "Disponibilidad todo el año (peak: sep–mar)",
     presentacion: "Caja de 10 kg · Bin 400 kg · Granel a pedido",
     atributos: [
       { k: "Materia seca", v: "≥ 23%" },
       { k: "Estado de madurez", v: "Verde firme · Consumo inmediato" },
-      { k: "Cadena de frío", v: "5–7 °C en transporte" },
       { k: "Trazabilidad", v: "Por lote y huerto de origen" },
     ],
+    precio: 3500,
+    unidad: "kg",
+  },
+  {
+    id: "palta-32",
+    name: "Palta Hass Calibre 32",
+    image: productoPalta,
+    tagline: "Calibre económico, rendimiento por kilo para volumen.",
+    description:
+      "Palta Hass calibre 32 (140–160 g por unidad). Excelente relación precio/kilo para casinos, minimarkets, juguerías y operaciones que priorizan rendimiento y rotación.",
+    variedades: ["Hass"],
+    calibres: ["32 (140–160 g por unidad)"],
+    origen: "Región de Valparaíso · Región Metropolitana",
+    temporada: "Disponibilidad todo el año (peak: sep–mar)",
+    presentacion: "Caja de 10 kg · Bin 400 kg · Granel a pedido",
+    atributos: [
+      { k: "Materia seca", v: "≥ 23%" },
+      { k: "Estado de madurez", v: "Verde firme · Consumo inmediato" },
+      { k: "Trazabilidad", v: "Por lote y huerto de origen" },
+    ],
+    precio: 1900,
+    unidad: "kg",
   },
   {
     id: "tomate",
-    name: "Tomate Larga Vida",
+    name: "Tomate",
     image: productoTomate,
     tagline: "Firmeza, color y consistencia en cada caja.",
     description:
-      "Tomate de larga vida útil postcosecha, ideal para retail de rotación y para operaciones HORECA que exigen presentación uniforme y buen rendimiento en corte.",
+      "Tomate fresco de larga vida útil postcosecha, ideal para retail de rotación y para operaciones HORECA que exigen presentación uniforme y buen rendimiento en corte.",
     variedades: ["Larga Vida", "Roma / Perita", "Cherry en racimo"],
     calibres: ["GG (82–102 mm)", "G (67–82 mm)", "M (57–67 mm)", "P (47–57 mm)"],
     origen: "Valle de Quillota · Región del Maule",
@@ -73,18 +93,19 @@ const CATALOGO: Producto[] = [
     atributos: [
       { k: "Grado Brix", v: "4.5° – 5.5°" },
       { k: "Color (escala USDA)", v: "5–6 al despacho" },
-      { k: "Cadena de frío", v: "10–12 °C" },
       { k: "Vida útil", v: "10–14 días en góndola" },
     ],
+    precio: 1000,
+    unidad: "kg",
   },
   {
-    id: "limon",
-    name: "Limón Sutil / Eureka",
+    id: "limon-messina",
+    name: "Limón Amarillo Messina",
     image: productoLimon,
-    tagline: "Aroma, acidez y rendimiento de jugo garantizados.",
+    tagline: "Variedad Messina: aroma intenso y jugosidad garantizada.",
     description:
-      "Limón de cáscara pareja y alto contenido de jugo. Selección para bar, cocina de restaurante y góndola de supermercado, con calibre uniforme para presentación premium.",
-    variedades: ["Eureka", "Fino / Génova", "Sutil (Pica)"],
+      "Limón amarillo variedad Messina, de cáscara amarilla uniforme y alto contenido de jugo. Selección para bar, cocina de restaurante y góndola de supermercado con calibre parejo.",
+    variedades: ["Messina (amarillo)"],
     calibres: ["70", "75", "90", "100", "110", "125", "140"],
     origen: "Región de Coquimbo · Valle del Limarí",
     temporada: "Todo el año (peak: abr–oct)",
@@ -92,25 +113,145 @@ const CATALOGO: Producto[] = [
     atributos: [
       { k: "Contenido de jugo", v: "≥ 35%" },
       { k: "Acidez cítrica", v: "5–7% ac. cítrico" },
-      { k: "Cadena de frío", v: "8–10 °C" },
       { k: "Presentación", v: "Cáscara amarilla uniforme sin manchas" },
     ],
+    precio: 300,
+    unidad: "kg",
   },
-];
-
-// Productos adicionales del catálogo (ficha resumida)
-type ProductoResumen = {
-  id: string;
-  name: string;
-  emoji: string;
-  variedad: string;
-  presentacion: string;
-};
-const CATALOGO_EXTRA: ProductoResumen[] = [
-  { id: "ajo", name: "Ajo", emoji: "🧄", variedad: "Morado · Blanco", presentacion: "Malla 500 g · 1 kg · 5 kg" },
-  { id: "cebolla", name: "Cebolla", emoji: "🧅", variedad: "Temprana · Tardía", presentacion: "Malla · Granel · Caja 20 kg" },
-  { id: "zanahoria", name: "Zanahoria", emoji: "🥕", variedad: "Nantes · Chantenay", presentacion: "Caja 10 kg · 20 kg · Granel" },
-  { id: "morron", name: "Morrón", emoji: "🫑", variedad: "Rojo · Verde · Amarillo", presentacion: "Caja 8 kg · 12 kg" },
+  {
+    id: "morron",
+    name: "Pimiento Morrón Rojo",
+    emoji: "🫑",
+    tagline: "Código MR-O68 · Rojo intenso, pared gruesa.",
+    description:
+      "Pimiento morrón rojo MR-O68 de pared gruesa, apto para cocina caliente, parrilla y decoración de platos. Selección por color y firmeza.",
+    variedades: ["Morrón Rojo MR-O68"],
+    calibres: ["G · M · Uniforme"],
+    origen: "Zona centro de Chile · Invernadero",
+    temporada: "Todo el año",
+    presentacion: "Caja 8 kg · 12 kg · Unidad",
+    atributos: [
+      { k: "Color", v: "Rojo intenso uniforme" },
+      { k: "Firmeza", v: "Alta · Pared gruesa" },
+      { k: "Formato", v: "Se vende por unidad" },
+    ],
+    precio: 857,
+    unidad: "unidad",
+  },
+  {
+    id: "champinon",
+    name: "Champiñones Granel",
+    emoji: "🍄",
+    tagline: "Champiñón París fresco, listo para cocina profesional.",
+    description:
+      "Champiñón París (Agaricus bisporus) fresco a granel, para restaurantes, hoteles y casinos. Selección por tamaño y color, sin manchas.",
+    variedades: ["París · Agaricus bisporus"],
+    calibres: ["Chico · Mediano · Grande"],
+    origen: "Región Metropolitana · Valparaíso",
+    temporada: "Todo el año",
+    presentacion: "Bandeja 250 g · 500 g · Granel caja 3 kg",
+    atributos: [
+      { k: "Color", v: "Blanco · Sin manchas" },
+      { k: "Vida útil", v: "5–7 días refrigerado" },
+    ],
+    precio: 6600,
+    unidad: "kg",
+  },
+  {
+    id: "naranja",
+    name: "Naranja",
+    emoji: "🍊",
+    tagline: "Naranja de jugo con dulzor equilibrado.",
+    description:
+      "Naranja de mesa y jugo, alta jugosidad y buen contenido de azúcar. Ideal para juguerías, cafeterías y desayunos de hotel.",
+    variedades: ["Valencia · Navel"],
+    calibres: ["56 · 64 · 72 · 80 · 88"],
+    origen: "Región de Coquimbo · Valle del Limarí",
+    temporada: "Todo el año (peak: jun–oct)",
+    presentacion: "Caja 15 kg · Malla · Granel",
+    atributos: [
+      { k: "Contenido de jugo", v: "≥ 45%" },
+      { k: "Grado Brix", v: "10° – 12°" },
+    ],
+    precio: 500,
+    unidad: "kg",
+  },
+  {
+    id: "cebolla",
+    name: "Cebolla Granel",
+    emoji: "🧅",
+    tagline: "Cebolla firme para rotación diaria en cocina.",
+    description:
+      "Cebolla temprana y tardía a granel, calibre uniforme, pelable, ideal para volumen HORECA y reposición de retail.",
+    variedades: ["Temprana", "Tardía"],
+    calibres: ["M (60–80 mm)", "G (80–100 mm)"],
+    origen: "Región de O'Higgins · Maule",
+    temporada: "Todo el año",
+    presentacion: "Granel caja 20 kg · Malla 5 kg · 10 kg",
+    atributos: [
+      { k: "Firmeza", v: "Alta" },
+      { k: "Pelabilidad", v: "Óptima · Sin brotes" },
+    ],
+    precio: 500,
+    unidad: "kg",
+  },
+  {
+    id: "papa",
+    name: "Papa Lavada",
+    emoji: "🥔",
+    tagline: "Papa lavada lista para cocina, calibre uniforme.",
+    description:
+      "Papa lavada de piel limpia y calibre parejo, apta para papas fritas, puré, cocción y horno. Reduce merma en cocina profesional.",
+    variedades: ["Desirée", "Karú", "Yagana"],
+    calibres: ["M (60–80 mm)", "G (80–100 mm)"],
+    origen: "Región de La Araucanía · Los Lagos",
+    temporada: "Todo el año",
+    presentacion: "Saco 25 kg · Caja 20 kg · Granel",
+    atributos: [
+      { k: "Piel", v: "Lavada · Limpia" },
+      { k: "Calibre", v: "Uniforme por lote" },
+    ],
+    precio: 420,
+    unidad: "kg",
+  },
+  {
+    id: "zanahoria",
+    name: "Zanahoria",
+    emoji: "🥕",
+    tagline: "Zanahoria firme, dulce y de color intenso.",
+    description:
+      "Zanahoria seleccionada por calibre y color, para cocina, ensaladas frescas y jugos naturales. Rendimiento consistente por caja.",
+    variedades: ["Nantes", "Chantenay"],
+    calibres: ["Caja 10 kg · 20 kg"],
+    origen: "Región Metropolitana · O'Higgins",
+    temporada: "Todo el año",
+    presentacion: "Caja 10 kg · 20 kg · Granel",
+    atributos: [
+      { k: "Color", v: "Naranja intenso" },
+      { k: "Firmeza", v: "Alta" },
+    ],
+    precio: 400,
+    unidad: "kg",
+  },
+  {
+    id: "ajo",
+    name: "Ajo",
+    emoji: "🧄",
+    tagline: "Cabezas firmes, aromáticas, sin brotes.",
+    description:
+      "Ajo morado y blanco de cabezas grandes, dientes bien formados, alto contenido aromático. Se comercializa por cabeza.",
+    variedades: ["Morado", "Blanco"],
+    calibres: ["M · G · GG (por cabeza)"],
+    origen: "Región de Coquimbo · Valparaíso",
+    temporada: "Todo el año (peak cosecha: nov–ene)",
+    presentacion: "Malla 500 g · 1 kg · 5 kg · Cabeza unitaria",
+    atributos: [
+      { k: "Firmeza", v: "Alta · Sin brotes" },
+      { k: "Formato", v: "Se vende por cabeza" },
+    ],
+    precio: 250,
+    unidad: "cabeza",
+  },
 ];
 
 // Productos picados / procesados
