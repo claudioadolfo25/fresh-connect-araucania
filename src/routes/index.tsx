@@ -568,14 +568,20 @@ function Catalogo() {
               className="block w-full text-left"
             >
               <div className="aspect-[4/3] overflow-hidden bg-secondary">
-                <img
-                  src={p.image}
-                  alt={p.name}
-                  loading="lazy"
-                  width={1024}
-                  height={1024}
-                  className="h-full w-full object-cover transition group-hover:scale-[1.03]"
-                />
+                {p.image ? (
+                  <img
+                    src={p.image}
+                    alt={p.name}
+                    loading="lazy"
+                    width={1024}
+                    height={1024}
+                    className="h-full w-full object-cover transition group-hover:scale-[1.03]"
+                  />
+                ) : (
+                  <div className="grid h-full w-full place-items-center text-7xl">
+                    <span aria-hidden>{p.emoji}</span>
+                  </div>
+                )}
               </div>
               <div className="p-5">
                 <div className="text-xs uppercase tracking-widest text-[color:var(--primary-deep)]">
@@ -583,6 +589,9 @@ function Catalogo() {
                 </div>
                 <div className="mt-1 text-lg font-semibold">{p.name}</div>
                 <p className="mt-1 text-sm text-muted-foreground">{p.tagline}</p>
+                <p className="mt-2 text-xs font-semibold text-[color:var(--primary-deep)]">
+                  {CLP(p.precio)} por {p.unidad}
+                </p>
               </div>
             </button>
           </article>
@@ -633,41 +642,9 @@ function Catalogo() {
         </aside>
       </div>
 
-      <p className="mt-4 text-xs text-muted-foreground">
-        Catálogo inicial: palta Hass, tomate y limón. Cebolla, ajo y otros productos frescos
-        disponibles bajo pedido.
+      <p className="mt-6 text-xs text-muted-foreground">
+        Todos los productos incluyen ficha técnica, precio referencial y logística integral desde Temuco.
       </p>
-
-      <div className="mt-10">
-        <div className="mb-4 text-xs uppercase tracking-widest text-muted-foreground">
-          También en catálogo
-        </div>
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          {CATALOGO_EXTRA.map((p) => (
-            <div
-              key={p.id}
-              className="rounded-2xl border border-border bg-card p-5 transition hover:border-primary/40 hover:shadow-sm"
-            >
-              <div className="grid h-24 place-items-center rounded-xl bg-secondary text-5xl">
-                <span aria-hidden>{p.emoji}</span>
-              </div>
-              <h4 className="mt-3 text-base font-semibold">{p.name}</h4>
-              <p className="mt-1 text-xs text-muted-foreground">
-                Variedad: {p.variedad}
-              </p>
-              <p className="text-xs text-muted-foreground">
-                Presentación: {p.presentacion}
-              </p>
-              <a
-                href="#cotizar"
-                className="mt-3 inline-flex text-xs font-medium text-[color:var(--primary-deep)] hover:underline"
-              >
-                Ver ficha técnica →
-              </a>
-            </div>
-          ))}
-        </div>
-      </div>
     </section>
   );
 }
