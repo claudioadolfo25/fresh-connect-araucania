@@ -14,7 +14,51 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      quote_requests: {
+        Row: {
+          comuna: string
+          created_at: string
+          email: string
+          id: string
+          mensaje: string | null
+          nombre: string
+          productos: Json | null
+          rubro: string
+          rut: string
+          telefono: string
+          total_estimado: number | null
+          volumen: string
+        }
+        Insert: {
+          comuna: string
+          created_at?: string
+          email: string
+          id?: string
+          mensaje?: string | null
+          nombre: string
+          productos?: Json | null
+          rubro: string
+          rut: string
+          telefono: string
+          total_estimado?: number | null
+          volumen: string
+        }
+        Update: {
+          comuna?: string
+          created_at?: string
+          email?: string
+          id?: string
+          mensaje?: string | null
+          nombre?: string
+          productos?: Json | null
+          rubro?: string
+          rut?: string
+          telefono?: string
+          total_estimado?: number | null
+          volumen?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
