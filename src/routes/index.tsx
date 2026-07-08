@@ -888,7 +888,7 @@ function QRCard() {
           </div>
           <dl className="mt-6 grid gap-3 text-sm">
             <Row k="Cargo" v="Key Account Manager" />
-            <Row k="Organización" v="PEPEPALTA.CL" />
+            <Row k="Organización" v="PMA SpA" />
             <Row k="Celular" v="+56 9 3517 9017" href={`tel:+${WHATSAPP_NUMBER}`} />
             <Row k="Correo" v={CONTACT_EMAIL} href={`mailto:${CONTACT_EMAIL}`} />
             <Row k="Eslogan" v="Tu asesor estratégico en el abastecimiento de productos frescos" />
