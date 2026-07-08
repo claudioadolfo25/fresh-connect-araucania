@@ -1,10 +1,11 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { QRCodeSVG } from "qrcode.react";
 import claudioSupermercado from "@/assets/claudio-supermercado.jpg";
 import productoPalta from "@/assets/producto-palta.jpg";
 import productoTomate from "@/assets/producto-tomate.jpg";
 import productoLimon from "@/assets/producto-limon.jpg";
+import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/")({
   component: Index,
@@ -19,16 +20,12 @@ const WHATSAPP_URL = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent
 )}`;
 const CONTACT_EMAIL = "key@co-kizuna.com";
 
-// Webhook endpoint for form submissions — edit here
-const QUOTE_WEBHOOK_URL =
-  (typeof import.meta !== "undefined" && (import.meta as any).env?.VITE_QUOTE_WEBHOOK_URL) ||
-  "";
-
-// Catálogo de productos frescos — inicial: palta, tomate, limón
+// Catálogo de productos frescos con ficha técnica y precio
 type Producto = {
   id: string;
   name: string;
-  image: string;
+  image?: string;
+  emoji?: string;
   tagline: string;
   description: string;
   variedades: string[];
@@ -37,34 +34,57 @@ type Producto = {
   temporada: string;
   presentacion: string;
   atributos: { k: string; v: string }[];
+  precio: number;
+  unidad: string; // "kg", "unidad", "cabeza"
 };
 const CATALOGO: Producto[] = [
   {
-    id: "palta",
-    name: "Palta Hass",
+    id: "palta-16",
+    name: "Palta Hass Calibre 16",
     image: productoPalta,
-    tagline: "El estándar de exportación, disponible en La Araucanía.",
+    tagline: "Calibre premium para retail y HORECA de alto nivel.",
     description:
-      "Palta Hass de piel rugosa y pulpa cremosa, con alto contenido de aceite. Seleccionada en huerto y madurada bajo control para llegar en su punto óptimo a retail y HORECA.",
+      "Palta Hass calibre 16 de gran tamaño (270–300 g por unidad). Pulpa cremosa, alto contenido de aceite, ideal para presentación premium en góndola, tostadas gourmet y platos de autor.",
     variedades: ["Hass"],
-    calibres: ["12", "14", "16", "18", "20", "22", "24", "26", "28", "30", "32"],
+    calibres: ["16 (270–300 g por unidad)"],
     origen: "Región de Valparaíso · Región Metropolitana",
     temporada: "Disponibilidad todo el año (peak: sep–mar)",
     presentacion: "Caja de 10 kg · Bin 400 kg · Granel a pedido",
     atributos: [
       { k: "Materia seca", v: "≥ 23%" },
       { k: "Estado de madurez", v: "Verde firme · Consumo inmediato" },
-      { k: "Cadena de frío", v: "5–7 °C en transporte" },
       { k: "Trazabilidad", v: "Por lote y huerto de origen" },
     ],
+    precio: 3500,
+    unidad: "kg",
+  },
+  {
+    id: "palta-32",
+    name: "Palta Hass Calibre 32",
+    image: productoPalta,
+    tagline: "Calibre económico, rendimiento por kilo para volumen.",
+    description:
+      "Palta Hass calibre 32 (140–160 g por unidad). Excelente relación precio/kilo para casinos, minimarkets, juguerías y operaciones que priorizan rendimiento y rotación.",
+    variedades: ["Hass"],
+    calibres: ["32 (140–160 g por unidad)"],
+    origen: "Región de Valparaíso · Región Metropolitana",
+    temporada: "Disponibilidad todo el año (peak: sep–mar)",
+    presentacion: "Caja de 10 kg · Bin 400 kg · Granel a pedido",
+    atributos: [
+      { k: "Materia seca", v: "≥ 23%" },
+      { k: "Estado de madurez", v: "Verde firme · Consumo inmediato" },
+      { k: "Trazabilidad", v: "Por lote y huerto de origen" },
+    ],
+    precio: 1900,
+    unidad: "kg",
   },
   {
     id: "tomate",
-    name: "Tomate Larga Vida",
+    name: "Tomate",
     image: productoTomate,
     tagline: "Firmeza, color y consistencia en cada caja.",
     description:
-      "Tomate de larga vida útil postcosecha, ideal para retail de rotación y para operaciones HORECA que exigen presentación uniforme y buen rendimiento en corte.",
+      "Tomate fresco de larga vida útil postcosecha, ideal para retail de rotación y para operaciones HORECA que exigen presentación uniforme y buen rendimiento en corte.",
     variedades: ["Larga Vida", "Roma / Perita", "Cherry en racimo"],
     calibres: ["GG (82–102 mm)", "G (67–82 mm)", "M (57–67 mm)", "P (47–57 mm)"],
     origen: "Valle de Quillota · Región del Maule",
@@ -73,18 +93,19 @@ const CATALOGO: Producto[] = [
     atributos: [
       { k: "Grado Brix", v: "4.5° – 5.5°" },
       { k: "Color (escala USDA)", v: "5–6 al despacho" },
-      { k: "Cadena de frío", v: "10–12 °C" },
       { k: "Vida útil", v: "10–14 días en góndola" },
     ],
+    precio: 1000,
+    unidad: "kg",
   },
   {
-    id: "limon",
-    name: "Limón Sutil / Eureka",
+    id: "limon-messina",
+    name: "Limón Amarillo Messina",
     image: productoLimon,
-    tagline: "Aroma, acidez y rendimiento de jugo garantizados.",
+    tagline: "Variedad Messina: aroma intenso y jugosidad garantizada.",
     description:
-      "Limón de cáscara pareja y alto contenido de jugo. Selección para bar, cocina de restaurante y góndola de supermercado, con calibre uniforme para presentación premium.",
-    variedades: ["Eureka", "Fino / Génova", "Sutil (Pica)"],
+      "Limón amarillo variedad Messina, de cáscara amarilla uniforme y alto contenido de jugo. Selección para bar, cocina de restaurante y góndola de supermercado con calibre parejo.",
+    variedades: ["Messina (amarillo)"],
     calibres: ["70", "75", "90", "100", "110", "125", "140"],
     origen: "Región de Coquimbo · Valle del Limarí",
     temporada: "Todo el año (peak: abr–oct)",
@@ -92,25 +113,145 @@ const CATALOGO: Producto[] = [
     atributos: [
       { k: "Contenido de jugo", v: "≥ 35%" },
       { k: "Acidez cítrica", v: "5–7% ac. cítrico" },
-      { k: "Cadena de frío", v: "8–10 °C" },
       { k: "Presentación", v: "Cáscara amarilla uniforme sin manchas" },
     ],
+    precio: 300,
+    unidad: "kg",
   },
-];
-
-// Productos adicionales del catálogo (ficha resumida)
-type ProductoResumen = {
-  id: string;
-  name: string;
-  emoji: string;
-  variedad: string;
-  presentacion: string;
-};
-const CATALOGO_EXTRA: ProductoResumen[] = [
-  { id: "ajo", name: "Ajo", emoji: "🧄", variedad: "Morado · Blanco", presentacion: "Malla 500 g · 1 kg · 5 kg" },
-  { id: "cebolla", name: "Cebolla", emoji: "🧅", variedad: "Temprana · Tardía", presentacion: "Malla · Granel · Caja 20 kg" },
-  { id: "zanahoria", name: "Zanahoria", emoji: "🥕", variedad: "Nantes · Chantenay", presentacion: "Caja 10 kg · 20 kg · Granel" },
-  { id: "morron", name: "Morrón", emoji: "🫑", variedad: "Rojo · Verde · Amarillo", presentacion: "Caja 8 kg · 12 kg" },
+  {
+    id: "morron",
+    name: "Pimiento Morrón Rojo",
+    emoji: "🫑",
+    tagline: "Código MR-O68 · Rojo intenso, pared gruesa.",
+    description:
+      "Pimiento morrón rojo MR-O68 de pared gruesa, apto para cocina caliente, parrilla y decoración de platos. Selección por color y firmeza.",
+    variedades: ["Morrón Rojo MR-O68"],
+    calibres: ["G · M · Uniforme"],
+    origen: "Zona centro de Chile · Invernadero",
+    temporada: "Todo el año",
+    presentacion: "Caja 8 kg · 12 kg · Unidad",
+    atributos: [
+      { k: "Color", v: "Rojo intenso uniforme" },
+      { k: "Firmeza", v: "Alta · Pared gruesa" },
+      { k: "Formato", v: "Se vende por unidad" },
+    ],
+    precio: 857,
+    unidad: "unidad",
+  },
+  {
+    id: "champinon",
+    name: "Champiñones Granel",
+    emoji: "🍄",
+    tagline: "Champiñón París fresco, listo para cocina profesional.",
+    description:
+      "Champiñón París (Agaricus bisporus) fresco a granel, para restaurantes, hoteles y casinos. Selección por tamaño y color, sin manchas.",
+    variedades: ["París · Agaricus bisporus"],
+    calibres: ["Chico · Mediano · Grande"],
+    origen: "Región Metropolitana · Valparaíso",
+    temporada: "Todo el año",
+    presentacion: "Bandeja 250 g · 500 g · Granel caja 3 kg",
+    atributos: [
+      { k: "Color", v: "Blanco · Sin manchas" },
+      { k: "Vida útil", v: "5–7 días refrigerado" },
+    ],
+    precio: 6600,
+    unidad: "kg",
+  },
+  {
+    id: "naranja",
+    name: "Naranja",
+    emoji: "🍊",
+    tagline: "Naranja de jugo con dulzor equilibrado.",
+    description:
+      "Naranja de mesa y jugo, alta jugosidad y buen contenido de azúcar. Ideal para juguerías, cafeterías y desayunos de hotel.",
+    variedades: ["Valencia · Navel"],
+    calibres: ["56 · 64 · 72 · 80 · 88"],
+    origen: "Región de Coquimbo · Valle del Limarí",
+    temporada: "Todo el año (peak: jun–oct)",
+    presentacion: "Caja 15 kg · Malla · Granel",
+    atributos: [
+      { k: "Contenido de jugo", v: "≥ 45%" },
+      { k: "Grado Brix", v: "10° – 12°" },
+    ],
+    precio: 500,
+    unidad: "kg",
+  },
+  {
+    id: "cebolla",
+    name: "Cebolla Granel",
+    emoji: "🧅",
+    tagline: "Cebolla firme para rotación diaria en cocina.",
+    description:
+      "Cebolla temprana y tardía a granel, calibre uniforme, pelable, ideal para volumen HORECA y reposición de retail.",
+    variedades: ["Temprana", "Tardía"],
+    calibres: ["M (60–80 mm)", "G (80–100 mm)"],
+    origen: "Región de O'Higgins · Maule",
+    temporada: "Todo el año",
+    presentacion: "Granel caja 20 kg · Malla 5 kg · 10 kg",
+    atributos: [
+      { k: "Firmeza", v: "Alta" },
+      { k: "Pelabilidad", v: "Óptima · Sin brotes" },
+    ],
+    precio: 500,
+    unidad: "kg",
+  },
+  {
+    id: "papa",
+    name: "Papa Lavada",
+    emoji: "🥔",
+    tagline: "Papa lavada lista para cocina, calibre uniforme.",
+    description:
+      "Papa lavada de piel limpia y calibre parejo, apta para papas fritas, puré, cocción y horno. Reduce merma en cocina profesional.",
+    variedades: ["Desirée", "Karú", "Yagana"],
+    calibres: ["M (60–80 mm)", "G (80–100 mm)"],
+    origen: "Región de La Araucanía · Los Lagos",
+    temporada: "Todo el año",
+    presentacion: "Saco 25 kg · Caja 20 kg · Granel",
+    atributos: [
+      { k: "Piel", v: "Lavada · Limpia" },
+      { k: "Calibre", v: "Uniforme por lote" },
+    ],
+    precio: 420,
+    unidad: "kg",
+  },
+  {
+    id: "zanahoria",
+    name: "Zanahoria",
+    emoji: "🥕",
+    tagline: "Zanahoria firme, dulce y de color intenso.",
+    description:
+      "Zanahoria seleccionada por calibre y color, para cocina, ensaladas frescas y jugos naturales. Rendimiento consistente por caja.",
+    variedades: ["Nantes", "Chantenay"],
+    calibres: ["Caja 10 kg · 20 kg"],
+    origen: "Región Metropolitana · O'Higgins",
+    temporada: "Todo el año",
+    presentacion: "Caja 10 kg · 20 kg · Granel",
+    atributos: [
+      { k: "Color", v: "Naranja intenso" },
+      { k: "Firmeza", v: "Alta" },
+    ],
+    precio: 400,
+    unidad: "kg",
+  },
+  {
+    id: "ajo",
+    name: "Ajo",
+    emoji: "🧄",
+    tagline: "Cabezas firmes, aromáticas, sin brotes.",
+    description:
+      "Ajo morado y blanco de cabezas grandes, dientes bien formados, alto contenido aromático. Se comercializa por cabeza.",
+    variedades: ["Morado", "Blanco"],
+    calibres: ["M · G · GG (por cabeza)"],
+    origen: "Región de Coquimbo · Valparaíso",
+    temporada: "Todo el año (peak cosecha: nov–ene)",
+    presentacion: "Malla 500 g · 1 kg · 5 kg · Cabeza unitaria",
+    atributos: [
+      { k: "Firmeza", v: "Alta · Sin brotes" },
+      { k: "Formato", v: "Se vende por cabeza" },
+    ],
+    precio: 250,
+    unidad: "cabeza",
+  },
 ];
 
 // Productos picados / procesados
@@ -191,7 +332,7 @@ const VCARD = `BEGIN:VCARD
 VERSION:3.0
 N:Ayelef;Claudio;;;
 FN:Claudio Ayelef
-ORG:PEPEPALTA.CL
+ORG:PMA SpA
 TITLE:Key Account Manager
 TEL;TYPE=CELL:+56935179017
 EMAIL:key@co-kizuna.com
@@ -215,6 +356,16 @@ const ALL_COMUNAS = [...CAUTIN, ...MALLECO];
 const RUBROS = ["Supermercado", "Restaurante", "Hotel", "Casino", "Cafetería", "Juguería", "Otro"];
 const VOLUMES = ["<100 kg", "100–500 kg", "500–1.000 kg", ">1.000 kg"];
 
+// Rubros que atiende PMA SpA
+const RUBROS_CARDS = [
+  { icon: "🍽️", name: "Restaurantes", desc: "Paltas por calibre, verduras frescas y reposición semanal confiable." },
+  { icon: "🏭", name: "Casinos", desc: "Volúmenes grandes con precio estable y entrega programada." },
+  { icon: "🏨", name: "Hoteles", desc: "Fruta y verdura seleccionada para desayunos y banquetería." },
+  { icon: "🛒", name: "Minimarkets", desc: "Productos listos para reventa con buen margen y rotación." },
+  { icon: "☕", name: "Cafeterías", desc: "Palta lista para tostadas y sándwiches, fruta fresca de temporada." },
+  { icon: "🥤", name: "Juguerías", desc: "Fruta de temporada con el rendimiento que tu negocio necesita." },
+];
+
 const CLP = (n: number) =>
   "$" + n.toLocaleString("es-CL", { maximumFractionDigits: 0 });
 
@@ -230,6 +381,8 @@ function Index() {
       <Servicio />
       <Catalogo />
       <Picados />
+      <Simulador />
+      <Rubros />
       <SectoresTemuco />
       <QRCard />
       <Coverage />
@@ -251,13 +404,15 @@ function Nav() {
           <span className="grid h-9 w-9 place-items-center rounded-full bg-primary text-primary-foreground text-sm font-semibold">絆</span>
           <span className="text-sm">
             <span className="block font-semibold leading-tight">Claudio Ayelef</span>
-            <span className="block text-xs text-muted-foreground leading-tight">Key Account Manager · PEPEPALTA.CL</span>
+            <span className="block text-xs text-muted-foreground leading-tight">Key Account Manager · PMA SpA</span>
           </span>
         </a>
         <nav className="hidden gap-6 md:flex text-sm text-muted-foreground">
           <a href="#servicio" className="hover:text-primary">Servicio</a>
           <a href="#catalogo" className="hover:text-primary">Catálogo</a>
           <a href="#picados" className="hover:text-primary">Picados</a>
+          <a href="#simulador" className="hover:text-primary">Simulador</a>
+          <a href="#rubros" className="hover:text-primary">Rubros</a>
           <a href="#cobertura" className="hover:text-primary">Cobertura</a>
           <a href="#testimonios" className="hover:text-primary">Testimonios</a>
           <a href="#cotizar" className="hover:text-primary">Cotizar</a>
@@ -288,7 +443,7 @@ function Hero() {
       <div className="mx-auto max-w-6xl px-5 py-20 md:py-28">
         <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-border bg-card px-3 py-1 text-xs text-muted-foreground">
           <span className="h-2 w-2 rounded-full bg-[color:var(--accent-fresh)]" />
-          En alianza con PEPEPALTA.CL · Región de La Araucanía
+          PMA SpA · Región de La Araucanía
         </div>
         <h1 className="max-w-4xl text-4xl font-semibold leading-[1.1] tracking-tight md:text-6xl">
           El primer hub agro con{" "}
@@ -353,8 +508,8 @@ function Challenge() {
           <div className="mb-3 text-xs uppercase tracking-widest opacity-80">La solución</div>
           <h3 className="text-xl font-semibold">Cadena de suministro con un solo interlocutor</h3>
           <p className="mt-3 text-sm leading-relaxed opacity-90">
-            Productos seleccionados en origen, logística con cadena de frío y un asesor que
-            responde: frescura garantizada desde el campo hasta tu cocina o góndola.
+            Productos seleccionados en origen, logística integral y un asesor que responde:
+            frescura garantizada desde el campo hasta tu cocina o góndola.
           </p>
         </div>
       </div>
@@ -413,14 +568,20 @@ function Catalogo() {
               className="block w-full text-left"
             >
               <div className="aspect-[4/3] overflow-hidden bg-secondary">
-                <img
-                  src={p.image}
-                  alt={p.name}
-                  loading="lazy"
-                  width={1024}
-                  height={1024}
-                  className="h-full w-full object-cover transition group-hover:scale-[1.03]"
-                />
+                {p.image ? (
+                  <img
+                    src={p.image}
+                    alt={p.name}
+                    loading="lazy"
+                    width={1024}
+                    height={1024}
+                    className="h-full w-full object-cover transition group-hover:scale-[1.03]"
+                  />
+                ) : (
+                  <div className="grid h-full w-full place-items-center text-7xl">
+                    <span aria-hidden>{p.emoji}</span>
+                  </div>
+                )}
               </div>
               <div className="p-5">
                 <div className="text-xs uppercase tracking-widest text-[color:var(--primary-deep)]">
@@ -428,6 +589,9 @@ function Catalogo() {
                 </div>
                 <div className="mt-1 text-lg font-semibold">{p.name}</div>
                 <p className="mt-1 text-sm text-muted-foreground">{p.tagline}</p>
+                <p className="mt-2 text-xs font-semibold text-[color:var(--primary-deep)]">
+                  {CLP(p.precio)} por {p.unidad}
+                </p>
               </div>
             </button>
           </article>
@@ -478,41 +642,9 @@ function Catalogo() {
         </aside>
       </div>
 
-      <p className="mt-4 text-xs text-muted-foreground">
-        Catálogo inicial: palta Hass, tomate y limón. Cebolla, ajo y otros productos frescos
-        disponibles bajo pedido.
+      <p className="mt-6 text-xs text-muted-foreground">
+        Todos los productos incluyen ficha técnica, precio referencial y logística integral desde Temuco.
       </p>
-
-      <div className="mt-10">
-        <div className="mb-4 text-xs uppercase tracking-widest text-muted-foreground">
-          También en catálogo
-        </div>
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          {CATALOGO_EXTRA.map((p) => (
-            <div
-              key={p.id}
-              className="rounded-2xl border border-border bg-card p-5 transition hover:border-primary/40 hover:shadow-sm"
-            >
-              <div className="grid h-24 place-items-center rounded-xl bg-secondary text-5xl">
-                <span aria-hidden>{p.emoji}</span>
-              </div>
-              <h4 className="mt-3 text-base font-semibold">{p.name}</h4>
-              <p className="mt-1 text-xs text-muted-foreground">
-                Variedad: {p.variedad}
-              </p>
-              <p className="text-xs text-muted-foreground">
-                Presentación: {p.presentacion}
-              </p>
-              <a
-                href="#cotizar"
-                className="mt-3 inline-flex text-xs font-medium text-[color:var(--primary-deep)] hover:underline"
-              >
-                Ver ficha técnica →
-              </a>
-            </div>
-          ))}
-        </div>
-      </div>
     </section>
   );
 }
@@ -552,15 +684,10 @@ function Servicio() {
             icon="📦"
           />
           <ServicioCard
-            title="Plan de seguimiento 5 contactos"
-            desc="Prospección activa y estructurada en los días 1, 7, 14, 21 y 30. Construimos relaciones, no transacciones."
-            icon="🎯"
-            highlight
-          />
-          <ServicioCard
             title="Relación de confianza"
             desc="Excelencia con alma: calidad garantizada, cumplimiento impecable y atención personalizada."
             icon="🤝"
+            highlight
           />
           <ServicioCard
             title="Despacho fin de semana"
@@ -574,7 +701,7 @@ function Servicio() {
           />
           <ServicioCard
             title="Hub agro con logística integral"
-            desc="Desde Temuco, capital regional, hacia toda La Araucanía con cadena de frío controlada."
+            desc="Desde Temuco, capital regional, hacia toda La Araucanía con logística confiable."
             icon="🏭"
           />
         </div>
@@ -761,7 +888,7 @@ function QRCard() {
           </div>
           <dl className="mt-6 grid gap-3 text-sm">
             <Row k="Cargo" v="Key Account Manager" />
-            <Row k="Organización" v="PEPEPALTA.CL" />
+            <Row k="Organización" v="PMA SpA" />
             <Row k="Celular" v="+56 9 3517 9017" href={`tel:+${WHATSAPP_NUMBER}`} />
             <Row k="Correo" v={CONTACT_EMAIL} href={`mailto:${CONTACT_EMAIL}`} />
             <Row k="Eslogan" v="Tu asesor estratégico en el abastecimiento de productos frescos" />
@@ -1025,14 +1152,17 @@ function QuoteForm() {
 
     setStatus("sending");
     try {
-      if (QUOTE_WEBHOOK_URL) {
-        const res = await fetch(QUOTE_WEBHOOK_URL, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ ...data, submittedAt: new Date().toISOString() }),
-        });
-        if (!res.ok) throw new Error("Webhook error");
-      }
+      const { error } = await supabase.from("quote_requests").insert({
+        rut: String(data.rut || ""),
+        nombre: String(data.nombre || ""),
+        rubro: String(data.rubro || ""),
+        email,
+        telefono: String(data.telefono || ""),
+        comuna: String(data.comuna || ""),
+        volumen: String(data.volumen || ""),
+        mensaje: String(data.mensaje || "") || null,
+      });
+      if (error) throw error;
       setStatus("ok");
       form.reset();
     } catch {
@@ -1184,9 +1314,170 @@ function SelectField({
   );
 }
 
+function Simulador() {
+  const [qty, setQty] = useState<Record<string, number>>({});
+
+  const setValue = (id: string, v: number) => {
+    setQty((prev) => ({ ...prev, [id]: v < 0 ? 0 : v }));
+  };
+
+  const total = useMemo(
+    () =>
+      CATALOGO.reduce(
+        (sum, p) => sum + (qty[p.id] || 0) * p.precio,
+        0,
+      ),
+    [qty],
+  );
+
+  const seleccionados = CATALOGO.filter((p) => (qty[p.id] || 0) > 0);
+
+  const wsMessage =
+    seleccionados.length > 0
+      ? `Hola Claudio, quiero cotizar: ${seleccionados
+          .map((p) => `${qty[p.id]} ${p.unidad}(s) de ${p.name}`)
+          .join(", ")}. Total estimado: ${CLP(total)}.`
+      : "Hola Claudio, me interesa cotizar productos frescos.";
+  const wsUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(wsMessage)}`;
+
+  return (
+    <section id="simulador" className="mx-auto max-w-6xl px-5 py-16">
+      <div className="rounded-3xl border border-border bg-card p-6 md:p-10">
+        <div className="mb-8">
+          <div className="text-xs uppercase tracking-widest text-muted-foreground">
+            見積 · Simulador
+          </div>
+          <h2 className="mt-2 text-3xl font-semibold tracking-tight md:text-4xl">
+            Simulador de cotización
+          </h2>
+          <p className="mt-2 max-w-2xl text-sm text-muted-foreground">
+            Ingresa la cantidad requerida por producto y visualiza el total estimado. Los
+            precios son referenciales por{" "}
+            <strong className="text-foreground">unidad indicada</strong> y pueden variar según
+            temporada y volumen.
+          </p>
+        </div>
+
+        <div className="grid gap-3">
+          {CATALOGO.map((p) => {
+            const q = qty[p.id] || 0;
+            const subtotal = q * p.precio;
+            return (
+              <div
+                key={p.id}
+                className="grid grid-cols-1 gap-3 rounded-2xl border border-border bg-background p-4 sm:grid-cols-[1fr,auto,auto,auto] sm:items-center"
+              >
+                <div>
+                  <div className="text-sm font-semibold">{p.name}</div>
+                  <div className="text-xs text-muted-foreground">
+                    {CLP(p.precio)} por {p.unidad}
+                  </div>
+                </div>
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setValue(p.id, q - 1)}
+                    className="h-8 w-8 rounded-full border border-border text-lg leading-none hover:bg-secondary"
+                    aria-label={`Menos ${p.name}`}
+                  >
+                    −
+                  </button>
+                  <input
+                    type="number"
+                    min={0}
+                    value={q}
+                    onChange={(e) =>
+                      setValue(p.id, parseInt(e.target.value || "0", 10) || 0)
+                    }
+                    className="h-9 w-20 rounded-lg border border-border bg-background px-2 text-center text-sm outline-none focus:border-primary"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setValue(p.id, q + 1)}
+                    className="h-8 w-8 rounded-full border border-border text-lg leading-none hover:bg-secondary"
+                    aria-label={`Más ${p.name}`}
+                  >
+                    +
+                  </button>
+                </div>
+                <div className="text-xs text-muted-foreground sm:text-right">
+                  {p.unidad}
+                </div>
+                <div className="text-sm font-semibold sm:text-right sm:min-w-[100px]">
+                  {CLP(subtotal)}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+
+        <div className="mt-6 flex flex-col gap-4 rounded-2xl border border-primary/20 bg-primary p-6 text-primary-foreground sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <div className="text-xs uppercase tracking-widest opacity-80">Total estimado</div>
+            <div className="mt-1 text-3xl font-semibold">{CLP(total)}</div>
+            <div className="mt-1 text-xs opacity-80">
+              Referencial. IVA, despacho y descuentos por volumen se cotizan al confirmar.
+            </div>
+          </div>
+          <div className="flex flex-wrap gap-3">
+            <a
+              href={wsUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center rounded-full bg-background px-5 py-2.5 text-sm font-medium text-primary hover:opacity-90"
+            >
+              Enviar por WhatsApp →
+            </a>
+            <a
+              href="#cotizar"
+              className="inline-flex items-center rounded-full border border-primary-foreground/40 px-5 py-2.5 text-sm font-medium hover:bg-primary-foreground/10"
+            >
+              Cotización formal
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function Rubros() {
+  return (
+    <section id="rubros" className="mx-auto max-w-6xl px-5 py-16">
+      <div className="mb-8 text-center">
+        <div className="text-xs uppercase tracking-widest text-muted-foreground">
+          業種 · Para tu negocio
+        </div>
+        <h2 className="mt-2 text-3xl font-semibold tracking-tight md:text-4xl">
+          Abastecemos todo tipo de cocinas
+        </h2>
+        <p className="mx-auto mt-3 max-w-2xl text-sm text-muted-foreground">
+          De un local de barrio a una operación de banquetería: adaptamos el servicio a tu
+          rubro, tu volumen y tu ritmo de reposición.
+        </p>
+      </div>
+
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        {RUBROS_CARDS.map((r) => (
+          <div
+            key={r.name}
+            className="rounded-2xl border border-border bg-card p-6 transition hover:border-primary/40 hover:shadow-sm"
+          >
+            <div className="text-3xl" aria-hidden>
+              {r.icon}
+            </div>
+            <h3 className="mt-3 text-lg font-semibold">{r.name}</h3>
+            <p className="mt-2 text-sm text-muted-foreground">{r.desc}</p>
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+}
+
 const TRUST = [
-  { t: "Alianza con PEPEPALTA.CL", d: "Respaldo de un distribuidor consolidado de productos frescos." },
-  { t: "Cadena de frío garantizada", d: "Logística con temperatura controlada en toda La Araucanía." },
+  { t: "Respaldo PMA SpA", d: "Primer hub agro de La Araucanía, especialista en distribución de productos frescos." },
+  { t: "Logística integral", d: "Desde Temuco hacia toda La Araucanía con entregas confiables." },
   { t: "Atención personalizada", d: "Un solo interlocutor: Claudio Ayelef, Key Account Manager." },
   { t: "Resolución inmediata", d: "¿Un pedido con problemas? Lo resolvemos sin vueltas." },
   { t: "Privacidad respetada", d: "Tus datos se usan solo para tu cotización. Nunca con terceros." },
@@ -1224,7 +1515,7 @@ function Footer() {
               <span className="grid h-9 w-9 place-items-center rounded-full bg-primary text-primary-foreground text-sm font-semibold">絆</span>
               <div>
                 <div className="text-sm font-semibold">Claudio Ayelef</div>
-                <div className="text-xs text-muted-foreground">Key Account Manager · PEPEPALTA.CL</div>
+                <div className="text-xs text-muted-foreground">Key Account Manager · PMA SpA</div>
               </div>
             </div>
             <p className="mt-4 max-w-sm text-xs text-muted-foreground">
