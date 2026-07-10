@@ -1,10 +1,11 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { QRCodeSVG } from "qrcode.react";
 import claudioSupermercado from "@/assets/claudio-supermercado.jpg";
 import productoPalta from "@/assets/producto-palta.jpg";
 import productoTomate from "@/assets/producto-tomate.jpg";
 import productoLimon from "@/assets/producto-limon.jpg";
+import logoImg from "@/assets/logo.png";
 import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/")({
