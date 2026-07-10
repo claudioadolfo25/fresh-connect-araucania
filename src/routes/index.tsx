@@ -370,13 +370,11 @@ const RUBROS_CARDS = [
 const CLP = (n: number) =>
   "$" + n.toLocaleString("es-CL", { maximumFractionDigits: 0 });
 
-const todayEs = () =>
-  new Date().toLocaleDateString("es-CL", { day: "numeric", month: "long", year: "numeric" });
-
 function Index() {
   return (
     <div className="min-h-screen bg-background text-foreground">
       <Nav />
+      <PropuestaValor />
       <Hero />
       <Challenge />
       <Servicio />
