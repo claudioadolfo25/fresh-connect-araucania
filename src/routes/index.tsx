@@ -400,7 +400,7 @@ function Nav() {
     <header className="sticky top-0 z-40 border-b border-border/70 bg-background/85 backdrop-blur">
       <div className="mx-auto flex max-w-6xl items-center justify-between px-5 py-4">
         <a href="#top" className="flex items-center gap-2">
-          <span className="grid h-9 w-9 place-items-center rounded-full bg-primary text-primary-foreground text-sm font-semibold">絆</span>
+          <img src={logoImg} alt="PMA SpA" className="h-10 w-10 rounded-full object-contain bg-white p-0.5 border border-border" />
           <span className="text-sm">
             <span className="block font-semibold leading-tight">Claudio Ayelef</span>
             <span className="block text-xs text-muted-foreground leading-tight">Key Account Manager · PMA SpA</span>
@@ -416,16 +416,79 @@ function Nav() {
           <a href="#testimonios" className="hover:text-primary">Testimonios</a>
           <a href="#cotizar" className="hover:text-primary">Cotizar</a>
         </nav>
-        <a
-          href={WHATSAPP_URL}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="hidden md:inline-flex items-center rounded-full bg-primary px-4 py-2 text-xs font-medium text-primary-foreground hover:opacity-90"
-        >
-          WhatsApp
-        </a>
+        <div className="hidden md:flex items-center gap-2">
+          <Link
+            to="/dashboard"
+            className="inline-flex items-center rounded-full border border-primary/40 bg-card px-4 py-2 text-xs font-medium text-primary hover:bg-primary/5"
+          >
+            Acceder al Dashboard →
+          </Link>
+          <a
+            href={WHATSAPP_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center rounded-full bg-primary px-4 py-2 text-xs font-medium text-primary-foreground hover:opacity-90"
+          >
+            WhatsApp
+          </a>
+        </div>
       </div>
     </header>
+  );
+}
+
+function PropuestaValor() {
+  const items = [
+    {
+      icon: "🎯",
+      title: "Resolvemos tu abastecimiento crítico",
+      desc: "Un solo interlocutor para palta, tomate, limón, cebolla y más. Menos proveedores, menos errores, menos merma en tu operación diaria.",
+    },
+    {
+      icon: "📈",
+      title: "Te hacemos más rentable",
+      desc: "Calibres correctos por rubro, precio estable por volumen, entregas programadas y despacho de fin de semana. Cada peso invertido rinde en góndola y en cocina.",
+    },
+    {
+      icon: "💚",
+      title: "Construimos vínculo, no transacción",
+      desc: "Kizuna (絆): el lazo. Seguimiento personal, visitas en tu local, ajustes en tiempo real y una relación donde tu satisfacción es la métrica que importa.",
+    },
+  ];
+  return (
+    <section id="propuesta" className="border-b border-border/60 bg-[color:var(--primary-deep)] text-white">
+      <div className="mx-auto max-w-6xl px-5 py-16 md:py-20">
+        <div className="mb-10 flex flex-col items-start gap-4 md:flex-row md:items-end md:justify-between">
+          <div className="max-w-3xl">
+            <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-3 py-1 text-xs">
+              <span className="h-2 w-2 rounded-full bg-[color:var(--accent-fresh)]" />
+              Propuesta de valor
+            </div>
+            <h2 className="text-3xl md:text-5xl font-semibold leading-[1.05] tracking-tight">
+              No se trata de nosotros. <span className="opacity-80">Se trata de que tu negocio funcione mejor.</span>
+            </h2>
+            <p className="mt-4 text-white/80 md:text-lg">
+              Producto fresco correcto, en el momento correcto, al precio correcto — y una persona que responde cuando algo no calza.
+            </p>
+          </div>
+          <Link
+            to="/dashboard"
+            className="inline-flex items-center gap-2 rounded-full bg-white px-6 py-3 text-sm font-semibold text-[color:var(--primary-deep)] shadow-sm hover:bg-white/90"
+          >
+            Acceder al Dashboard →
+          </Link>
+        </div>
+        <div className="grid gap-5 md:grid-cols-3">
+          {items.map((it) => (
+            <div key={it.title} className="rounded-2xl border border-white/15 bg-white/5 p-6 backdrop-blur">
+              <div className="text-3xl">{it.icon}</div>
+              <h3 className="mt-3 text-lg font-semibold">{it.title}</h3>
+              <p className="mt-2 text-sm text-white/80 leading-relaxed">{it.desc}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
   );
 }
 
