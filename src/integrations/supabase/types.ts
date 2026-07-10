@@ -14,6 +14,134 @@ export type Database = {
   }
   public: {
     Tables: {
+      clientes: {
+        Row: {
+          comuna: string
+          created_at: string
+          created_by: string | null
+          direccion: string | null
+          email: string | null
+          estado: string
+          fuente: string | null
+          id: string
+          indice_kizuna: number | null
+          macrosector: string | null
+          nombre_fantasia: string | null
+          productos_clave: string | null
+          razon_social: string
+          rubro: string
+          telefono: string | null
+          updated_at: string
+          vendedor_id: string | null
+          volumen_estimado_semanal: string | null
+        }
+        Insert: {
+          comuna: string
+          created_at?: string
+          created_by?: string | null
+          direccion?: string | null
+          email?: string | null
+          estado?: string
+          fuente?: string | null
+          id?: string
+          indice_kizuna?: number | null
+          macrosector?: string | null
+          nombre_fantasia?: string | null
+          productos_clave?: string | null
+          razon_social: string
+          rubro: string
+          telefono?: string | null
+          updated_at?: string
+          vendedor_id?: string | null
+          volumen_estimado_semanal?: string | null
+        }
+        Update: {
+          comuna?: string
+          created_at?: string
+          created_by?: string | null
+          direccion?: string | null
+          email?: string | null
+          estado?: string
+          fuente?: string | null
+          id?: string
+          indice_kizuna?: number | null
+          macrosector?: string | null
+          nombre_fantasia?: string | null
+          productos_clave?: string | null
+          razon_social?: string
+          rubro?: string
+          telefono?: string | null
+          updated_at?: string
+          vendedor_id?: string | null
+          volumen_estimado_semanal?: string | null
+        }
+        Relationships: []
+      }
+      contactos: {
+        Row: {
+          canal: string
+          cliente_id: string
+          created_at: string
+          fecha: string
+          id: string
+          nota: string | null
+          tipo: string | null
+          usuario_id: string | null
+        }
+        Insert: {
+          canal: string
+          cliente_id: string
+          created_at?: string
+          fecha?: string
+          id?: string
+          nota?: string | null
+          tipo?: string | null
+          usuario_id?: string | null
+        }
+        Update: {
+          canal?: string
+          cliente_id?: string
+          created_at?: string
+          fecha?: string
+          id?: string
+          nota?: string | null
+          tipo?: string | null
+          usuario_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "contactos_cliente_id_fkey"
+            columns: ["cliente_id"]
+            isOneToOne: false
+            referencedRelation: "clientes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          created_at: string
+          email: string | null
+          id: string
+          nombre: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          email?: string | null
+          id: string
+          nombre?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          email?: string | null
+          id?: string
+          nombre?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       quote_requests: {
         Row: {
           comuna: string
@@ -59,15 +187,86 @@ export type Database = {
         }
         Relationships: []
       }
+      tareas_rutas: {
+        Row: {
+          cliente_id: string
+          comentarios: string | null
+          created_at: string
+          estado: string
+          fecha_programada: string
+          id: string
+          tipo: string
+          updated_at: string
+          usuario_id: string | null
+        }
+        Insert: {
+          cliente_id: string
+          comentarios?: string | null
+          created_at?: string
+          estado?: string
+          fecha_programada: string
+          id?: string
+          tipo: string
+          updated_at?: string
+          usuario_id?: string | null
+        }
+        Update: {
+          cliente_id?: string
+          comentarios?: string | null
+          created_at?: string
+          estado?: string
+          fecha_programada?: string
+          id?: string
+          tipo?: string
+          updated_at?: string
+          usuario_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tareas_rutas_cliente_id_fkey"
+            columns: ["cliente_id"]
+            isOneToOne: false
+            referencedRelation: "clientes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_roles: {
+        Row: {
+          created_at: string
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "admin" | "vendedor"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -194,6 +393,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["admin", "vendedor"],
+    },
   },
 } as const
