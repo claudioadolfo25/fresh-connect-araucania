@@ -473,7 +473,7 @@ function Hero() {
         </div>
         <div className="mt-10 flex flex-wrap gap-3 text-xs">
           <Badge>Primer hub agro de La Araucanía</Badge>
-          <Badge>Logística integral desde Temuco · {todayEs()}</Badge>
+          <Badge>Logística integral desde Temuco</Badge>
           <Badge>Respuesta en menos de 2 horas hábiles</Badge>
         </div>
       </div>
