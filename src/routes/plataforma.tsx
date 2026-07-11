@@ -8,7 +8,7 @@ import productoLimon from "@/assets/producto-limon.jpg";
 import logoImg from "@/assets/logo.png";
 import { supabase } from "@/integrations/supabase/client";
 
-export const Route = createFileRoute("/")({
+export const Route = createFileRoute("/plataforma")({
   component: Index,
 });
 
