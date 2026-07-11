@@ -19,7 +19,7 @@ const WHATSAPP_NUMBER = "56935179017";
 const WHATSAPP_URL = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(
   "Hola Claudio, me interesa cotizar productos frescos.",
 )}`;
-const CONTACT_EMAIL = "key@co-kizuna.com";
+const CONTACT_EMAIL = "freshkey.b2b@gmail.com";
 
 // Catálogo de productos frescos con ficha técnica y precio
 type Producto = {
@@ -1225,6 +1225,24 @@ function QuoteForm() {
         mensaje: String(data.mensaje || "") || null,
       });
       if (error) throw error;
+      // Enviar a WhatsApp y correo con el resumen
+      const resumen = [
+        `Nueva cotización FreshKey`,
+        `RUT/Razón: ${data.rut}`,
+        `Contacto: ${data.nombre}`,
+        `Rubro: ${data.rubro}`,
+        `Email: ${email}`,
+        `Teléfono: ${data.telefono}`,
+        `Comuna: ${data.comuna}`,
+        `Volumen semanal: ${data.volumen}`,
+        `Mensaje: ${data.mensaje || "-"}`,
+      ].join("\n");
+      const wa = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(resumen)}`;
+      const mail = `mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent(
+        "Nueva cotización desde el sitio",
+      )}&body=${encodeURIComponent(resumen)}`;
+      window.open(wa, "_blank", "noopener,noreferrer");
+      window.location.href = mail;
       setStatus("ok");
       form.reset();
     } catch {
