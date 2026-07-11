@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import heroLogistica from "@/assets/hero-logistica.jpg";
+import heroGrupaje from "@/assets/hero-grupaje.jpg.asset.json";
 import logoImg from "@/assets/logo.png";
 
 export const Route = createFileRoute("/")({
@@ -79,8 +79,8 @@ function Hero() {
   return (
     <section className="relative isolate overflow-hidden">
       <img
-        src={heroLogistica}
-        alt="Camión refrigerado descargando frutas y verduras en centro de distribución"
+        src={heroGrupaje.url}
+        alt="Centro de distribución de frutas y verduras con pallets y cajas de productos frescos"
         width={1920}
         height={1080}
         className="absolute inset-0 h-full w-full object-cover"
