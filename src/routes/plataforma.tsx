@@ -2,9 +2,6 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { QRCodeSVG } from "qrcode.react";
 import claudioSupermercado from "@/assets/claudio-supermercado.jpg";
-import productoPalta from "@/assets/producto-palta.jpg";
-import productoTomate from "@/assets/producto-tomate.jpg";
-import productoLimon from "@/assets/producto-limon.jpg";
 import logoImg from "@/assets/logo.png";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -37,12 +34,34 @@ type Producto = {
   atributos: { k: string; v: string }[];
   precio: number;
   unidad: string; // "kg", "unidad", "cabeza"
+  comingSoon?: boolean;
 };
 const CATALOGO: Producto[] = [
   {
+    id: "palta-12",
+    name: "Palta Hass Calibre 12",
+    emoji: "🥑",
+    tagline: "Calibre XL premium · Próximamente en catálogo.",
+    description:
+      "Palta Hass calibre 12 (325–365 g por unidad). El calibre más grande para presentación premium, cartas de autor y regalos corporativos. Disponibilidad limitada por temporada.",
+    variedades: ["Hass"],
+    calibres: ["12 (325–365 g por unidad)"],
+    origen: "Región de Valparaíso · Región Metropolitana",
+    temporada: "Peak: sep–feb (consultar disponibilidad)",
+    presentacion: "Caja de 10 kg · Pedido anticipado",
+    atributos: [
+      { k: "Materia seca", v: "≥ 24%" },
+      { k: "Estado de madurez", v: "Verde firme" },
+      { k: "Disponibilidad", v: "Próximamente · Precio a definir" },
+    ],
+    precio: 0,
+    unidad: "kg",
+    comingSoon: true,
+  },
+  {
     id: "palta-16",
     name: "Palta Hass Calibre 16",
-    image: productoPalta,
+    emoji: "🥑",
     tagline: "Calibre premium para retail y HORECA de alto nivel.",
     description:
       "Palta Hass calibre 16 de gran tamaño (270–300 g por unidad). Pulpa cremosa, alto contenido de aceite, ideal para presentación premium en góndola, tostadas gourmet y platos de autor.",
@@ -62,7 +81,7 @@ const CATALOGO: Producto[] = [
   {
     id: "palta-32",
     name: "Palta Hass Calibre 32",
-    image: productoPalta,
+    emoji: "🥑",
     tagline: "Calibre económico, rendimiento por kilo para volumen.",
     description:
       "Palta Hass calibre 32 (140–160 g por unidad). Excelente relación precio/kilo para casinos, minimarkets, juguerías y operaciones que priorizan rendimiento y rotación.",
@@ -82,7 +101,7 @@ const CATALOGO: Producto[] = [
   {
     id: "tomate",
     name: "Tomate",
-    image: productoTomate,
+    emoji: "🍅",
     tagline: "Firmeza, color y consistencia en cada caja.",
     description:
       "Tomate fresco de larga vida útil postcosecha, ideal para retail de rotación y para operaciones HORECA que exigen presentación uniforme y buen rendimiento en corte.",
@@ -102,7 +121,7 @@ const CATALOGO: Producto[] = [
   {
     id: "limon-messina",
     name: "Limón Amarillo Messina",
-    image: productoLimon,
+    emoji: "🍋",
     tagline: "Variedad Messina: aroma intenso y jugosidad garantizada.",
     description:
       "Limón amarillo variedad Messina, de cáscara amarilla uniforme y alto contenido de jugo. Selección para bar, cocina de restaurante y góndola de supermercado con calibre parejo.",
@@ -252,6 +271,86 @@ const CATALOGO: Producto[] = [
     ],
     precio: 250,
     unidad: "cabeza",
+  },
+  {
+    id: "papa-saco",
+    name: "Papa por Saco",
+    emoji: "🥔",
+    tagline: "Saco 25 kg listo para cocina · Próximamente.",
+    description:
+      "Saco de papa lavada de 25 kg, formato práctico para cocinas de alto volumen. Se vende por unidad (saco).",
+    variedades: ["Desirée", "Karú", "Yagana"],
+    calibres: ["Saco 25 kg"],
+    origen: "Región de La Araucanía · Los Lagos",
+    temporada: "Todo el año",
+    presentacion: "Saco 25 kg (unidad)",
+    atributos: [
+      { k: "Formato", v: "Saco 25 kg" },
+      { k: "Disponibilidad", v: "Próximamente · Precio a definir" },
+    ],
+    precio: 0,
+    unidad: "unidad",
+    comingSoon: true,
+  },
+  {
+    id: "cebolla-malla",
+    name: "Malla de Cebolla",
+    emoji: "🧅",
+    tagline: "Malla lista para reposición · Próximamente.",
+    description:
+      "Malla de cebolla firme y de calibre uniforme, formato práctico para retail y HORECA. Se vende por unidad (malla).",
+    variedades: ["Temprana", "Tardía"],
+    calibres: ["Malla 10 kg"],
+    origen: "Región de O'Higgins · Maule",
+    temporada: "Todo el año",
+    presentacion: "Malla (unidad)",
+    atributos: [
+      { k: "Formato", v: "Malla · Unidad" },
+      { k: "Disponibilidad", v: "Próximamente · Precio a definir" },
+    ],
+    precio: 0,
+    unidad: "unidad",
+    comingSoon: true,
+  },
+  {
+    id: "tomate-caja",
+    name: "Caja de Tomates",
+    emoji: "🍅",
+    tagline: "Caja lista para reponer · Próximamente.",
+    description:
+      "Caja de tomates de larga vida, formato práctico para reposición diaria. Se vende por unidad (caja).",
+    variedades: ["Larga Vida", "Roma / Perita"],
+    calibres: ["Caja 10 kg"],
+    origen: "Valle de Quillota · Región del Maule",
+    temporada: "Todo el año",
+    presentacion: "Caja (unidad)",
+    atributos: [
+      { k: "Formato", v: "Caja · Unidad" },
+      { k: "Disponibilidad", v: "Próximamente · Precio a definir" },
+    ],
+    precio: 0,
+    unidad: "unidad",
+    comingSoon: true,
+  },
+  {
+    id: "limon-malla",
+    name: "Malla de Limones",
+    emoji: "🍋",
+    tagline: "Malla lista para reposición · Próximamente.",
+    description:
+      "Malla de limones amarillos Messina, formato práctico para retail y HORECA. Se vende por unidad (malla).",
+    variedades: ["Messina (amarillo)"],
+    calibres: ["Malla 2 kg"],
+    origen: "Región de Coquimbo · Valle del Limarí",
+    temporada: "Todo el año",
+    presentacion: "Malla (unidad)",
+    atributos: [
+      { k: "Formato", v: "Malla · Unidad" },
+      { k: "Disponibilidad", v: "Próximamente · Precio a definir" },
+    ],
+    precio: 0,
+    unidad: "unidad",
+    comingSoon: true,
   },
 ];
 
@@ -652,7 +751,9 @@ function Catalogo() {
                 <div className="mt-1 text-lg font-semibold">{p.name}</div>
                 <p className="mt-1 text-sm text-muted-foreground">{p.tagline}</p>
                 <p className="mt-2 text-xs font-semibold text-[color:var(--primary-deep)]">
-                  {CLP(p.precio)} por {p.unidad}
+                  {p.comingSoon
+                    ? `Precio a definir · Próximamente (${p.unidad})`
+                    : `${CLP(p.precio)} por ${p.unidad}`}
                 </p>
               </div>
             </button>
@@ -1404,7 +1505,7 @@ function Simulador() {
   const total = useMemo(
     () =>
       CATALOGO.reduce(
-        (sum, p) => sum + (qty[p.id] || 0) * p.precio,
+        (sum, p) => sum + (p.comingSoon ? 0 : (qty[p.id] || 0) * p.precio),
         0,
       ),
     [qty],
@@ -1415,7 +1516,9 @@ function Simulador() {
   const wsMessage =
     seleccionados.length > 0
       ? `Hola Claudio, quiero cotizar: ${seleccionados
-          .map((p) => `${qty[p.id]} ${p.unidad}(s) de ${p.name}`)
+          .map((p) =>
+            `${qty[p.id]} ${p.unidad}(s) de ${p.name}${p.comingSoon ? " (precio a definir)" : ""}`,
+          )
           .join(", ")}. Total estimado: ${CLP(total)}.`
       : "Hola Claudio, me interesa cotizar productos frescos.";
   const wsUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(wsMessage)}`;
@@ -1441,16 +1544,37 @@ function Simulador() {
         <div className="grid gap-3">
           {CATALOGO.map((p) => {
             const q = qty[p.id] || 0;
-            const subtotal = q * p.precio;
+            const subtotal = p.comingSoon ? 0 : q * p.precio;
             return (
               <div
                 key={p.id}
-                className="grid grid-cols-1 gap-3 rounded-2xl border border-border bg-background p-4 sm:grid-cols-[1fr,auto,auto,auto] sm:items-center"
+                className="grid grid-cols-1 gap-3 rounded-2xl border border-border bg-background p-4 sm:grid-cols-[auto,1fr,auto,auto,auto] sm:items-center"
               >
+                <div className="flex h-14 w-14 items-center justify-center overflow-hidden rounded-xl bg-secondary">
+                  {p.image ? (
+                    <img
+                      src={p.image}
+                      alt={p.name}
+                      loading="lazy"
+                      className="h-full w-full object-cover"
+                    />
+                  ) : (
+                    <span className="text-3xl" aria-hidden>
+                      {p.emoji}
+                    </span>
+                  )}
+                </div>
                 <div>
-                  <div className="text-sm font-semibold">{p.name}</div>
+                  <div className="text-sm font-semibold">
+                    {p.name}
+                    {p.comingSoon && (
+                      <span className="ml-2 rounded-full bg-[color:var(--accent-fresh)]/20 px-2 py-0.5 text-[10px] font-medium uppercase tracking-widest text-[color:var(--primary-deep)]">
+                        Próximamente
+                      </span>
+                    )}
+                  </div>
                   <div className="text-xs text-muted-foreground">
-                    {CLP(p.precio)} por {p.unidad}
+                    {p.comingSoon ? `Precio a definir por ${p.unidad}` : `${CLP(p.precio)} por ${p.unidad}`}
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
@@ -1484,7 +1608,7 @@ function Simulador() {
                   {p.unidad}
                 </div>
                 <div className="text-sm font-semibold sm:text-right sm:min-w-[100px]">
-                  {CLP(subtotal)}
+                  {p.comingSoon ? <span className="text-muted-foreground">A definir</span> : CLP(subtotal)}
                 </div>
               </div>
             );
