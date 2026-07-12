@@ -85,20 +85,9 @@ function Hero() {
         height={1080}
         className="absolute inset-0 h-full w-full object-cover"
       />
-      <div className="absolute inset-0 bg-gradient-to-b from-emerald-950/85 via-emerald-950/70 to-emerald-950/85" />
-      <div className="relative mx-auto max-w-6xl px-5 py-24 md:py-36">
-        <span className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-3 py-1 text-[11px] uppercase tracking-widest text-amber-200">
-          <span className="h-1.5 w-1.5 rounded-full bg-amber-300" /> Hub agro · La Araucanía
-        </span>
-        <h1 className="mt-6 max-w-3xl text-4xl font-semibold leading-tight tracking-tight text-white md:text-6xl">
-          Tu operación sigue funcionando incluso cuando el mercado se vuelve impredecible.
-        </h1>
-        <p className="mt-6 max-w-2xl text-base leading-relaxed text-emerald-50/90 md:text-lg">
-          Un solo interlocutor para abastecimiento, logística y seguimiento de productos frescos en
-          toda La Araucanía. Tú te concentras en tu negocio. Nosotros nos hacemos cargo de que nunca
-          te falte lo que necesitas, cuando lo necesitas.
-        </p>
-        <div className="mt-8 flex flex-wrap gap-3">
+      <div className="absolute inset-0 bg-gradient-to-t from-emerald-950/90 via-emerald-950/40 to-emerald-950/30" />
+      <div className="relative mx-auto flex max-w-6xl items-end px-5 py-16 md:min-h-[520px] md:py-24">
+        <div className="flex flex-wrap gap-3">
           <Link
             to="/plataforma"
             hash="cotizar"
@@ -110,7 +99,7 @@ function Hero() {
             href={WA_URL}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center rounded-full border border-white/30 bg-white/5 px-6 py-3 text-sm font-medium text-white hover:bg-white/10"
+            className="inline-flex items-center rounded-full border border-white/30 bg-white/10 px-6 py-3 text-sm font-medium text-white hover:bg-white/20"
           >
             Hablar por WhatsApp
           </a>
