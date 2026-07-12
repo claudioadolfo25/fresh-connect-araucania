@@ -1505,7 +1505,7 @@ function Simulador() {
   const total = useMemo(
     () =>
       CATALOGO.reduce(
-        (sum, p) => sum + (qty[p.id] || 0) * p.precio,
+        (sum, p) => sum + (p.comingSoon ? 0 : (qty[p.id] || 0) * p.precio),
         0,
       ),
     [qty],
@@ -1516,7 +1516,9 @@ function Simulador() {
   const wsMessage =
     seleccionados.length > 0
       ? `Hola Claudio, quiero cotizar: ${seleccionados
-          .map((p) => `${qty[p.id]} ${p.unidad}(s) de ${p.name}`)
+          .map((p) =>
+            `${qty[p.id]} ${p.unidad}(s) de ${p.name}${p.comingSoon ? " (precio a definir)" : ""}`,
+          )
           .join(", ")}. Total estimado: ${CLP(total)}.`
       : "Hola Claudio, me interesa cotizar productos frescos.";
   const wsUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(wsMessage)}`;
@@ -1542,16 +1544,37 @@ function Simulador() {
         <div className="grid gap-3">
           {CATALOGO.map((p) => {
             const q = qty[p.id] || 0;
-            const subtotal = q * p.precio;
+            const subtotal = p.comingSoon ? 0 : q * p.precio;
             return (
               <div
                 key={p.id}
-                className="grid grid-cols-1 gap-3 rounded-2xl border border-border bg-background p-4 sm:grid-cols-[1fr,auto,auto,auto] sm:items-center"
+                className="grid grid-cols-1 gap-3 rounded-2xl border border-border bg-background p-4 sm:grid-cols-[auto,1fr,auto,auto,auto] sm:items-center"
               >
+                <div className="flex h-14 w-14 items-center justify-center overflow-hidden rounded-xl bg-secondary">
+                  {p.image ? (
+                    <img
+                      src={p.image}
+                      alt={p.name}
+                      loading="lazy"
+                      className="h-full w-full object-cover"
+                    />
+                  ) : (
+                    <span className="text-3xl" aria-hidden>
+                      {p.emoji}
+                    </span>
+                  )}
+                </div>
                 <div>
-                  <div className="text-sm font-semibold">{p.name}</div>
+                  <div className="text-sm font-semibold">
+                    {p.name}
+                    {p.comingSoon && (
+                      <span className="ml-2 rounded-full bg-[color:var(--accent-fresh)]/20 px-2 py-0.5 text-[10px] font-medium uppercase tracking-widest text-[color:var(--primary-deep)]">
+                        Próximamente
+                      </span>
+                    )}
+                  </div>
                   <div className="text-xs text-muted-foreground">
-                    {CLP(p.precio)} por {p.unidad}
+                    {p.comingSoon ? `Precio a definir por ${p.unidad}` : `${CLP(p.precio)} por ${p.unidad}`}
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
@@ -1585,7 +1608,7 @@ function Simulador() {
                   {p.unidad}
                 </div>
                 <div className="text-sm font-semibold sm:text-right sm:min-w-[100px]">
-                  {CLP(subtotal)}
+                  {p.comingSoon ? <span className="text-muted-foreground">A definir</span> : CLP(subtotal)}
                 </div>
               </div>
             );
