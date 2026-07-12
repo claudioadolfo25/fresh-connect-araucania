@@ -751,7 +751,9 @@ function Catalogo() {
                 <div className="mt-1 text-lg font-semibold">{p.name}</div>
                 <p className="mt-1 text-sm text-muted-foreground">{p.tagline}</p>
                 <p className="mt-2 text-xs font-semibold text-[color:var(--primary-deep)]">
-                  {CLP(p.precio)} por {p.unidad}
+                  {p.comingSoon
+                    ? `Precio a definir · Próximamente (${p.unidad})`
+                    : `${CLP(p.precio)} por ${p.unidad}`}
                 </p>
               </div>
             </button>
