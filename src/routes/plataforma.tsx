@@ -2,9 +2,6 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { QRCodeSVG } from "qrcode.react";
 import claudioSupermercado from "@/assets/claudio-supermercado.jpg";
-import productoPalta from "@/assets/producto-palta.jpg";
-import productoTomate from "@/assets/producto-tomate.jpg";
-import productoLimon from "@/assets/producto-limon.jpg";
 import logoImg from "@/assets/logo.png";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -37,12 +34,34 @@ type Producto = {
   atributos: { k: string; v: string }[];
   precio: number;
   unidad: string; // "kg", "unidad", "cabeza"
+  comingSoon?: boolean;
 };
 const CATALOGO: Producto[] = [
   {
+    id: "palta-12",
+    name: "Palta Hass Calibre 12",
+    emoji: "🥑",
+    tagline: "Calibre XL premium · Próximamente en catálogo.",
+    description:
+      "Palta Hass calibre 12 (325–365 g por unidad). El calibre más grande para presentación premium, cartas de autor y regalos corporativos. Disponibilidad limitada por temporada.",
+    variedades: ["Hass"],
+    calibres: ["12 (325–365 g por unidad)"],
+    origen: "Región de Valparaíso · Región Metropolitana",
+    temporada: "Peak: sep–feb (consultar disponibilidad)",
+    presentacion: "Caja de 10 kg · Pedido anticipado",
+    atributos: [
+      { k: "Materia seca", v: "≥ 24%" },
+      { k: "Estado de madurez", v: "Verde firme" },
+      { k: "Disponibilidad", v: "Próximamente · Precio a definir" },
+    ],
+    precio: 0,
+    unidad: "kg",
+    comingSoon: true,
+  },
+  {
     id: "palta-16",
     name: "Palta Hass Calibre 16",
-    image: productoPalta,
+    emoji: "🥑",
     tagline: "Calibre premium para retail y HORECA de alto nivel.",
     description:
       "Palta Hass calibre 16 de gran tamaño (270–300 g por unidad). Pulpa cremosa, alto contenido de aceite, ideal para presentación premium en góndola, tostadas gourmet y platos de autor.",
@@ -62,7 +81,7 @@ const CATALOGO: Producto[] = [
   {
     id: "palta-32",
     name: "Palta Hass Calibre 32",
-    image: productoPalta,
+    emoji: "🥑",
     tagline: "Calibre económico, rendimiento por kilo para volumen.",
     description:
       "Palta Hass calibre 32 (140–160 g por unidad). Excelente relación precio/kilo para casinos, minimarkets, juguerías y operaciones que priorizan rendimiento y rotación.",
@@ -82,7 +101,7 @@ const CATALOGO: Producto[] = [
   {
     id: "tomate",
     name: "Tomate",
-    image: productoTomate,
+    emoji: "🍅",
     tagline: "Firmeza, color y consistencia en cada caja.",
     description:
       "Tomate fresco de larga vida útil postcosecha, ideal para retail de rotación y para operaciones HORECA que exigen presentación uniforme y buen rendimiento en corte.",
@@ -102,7 +121,7 @@ const CATALOGO: Producto[] = [
   {
     id: "limon-messina",
     name: "Limón Amarillo Messina",
-    image: productoLimon,
+    emoji: "🍋",
     tagline: "Variedad Messina: aroma intenso y jugosidad garantizada.",
     description:
       "Limón amarillo variedad Messina, de cáscara amarilla uniforme y alto contenido de jugo. Selección para bar, cocina de restaurante y góndola de supermercado con calibre parejo.",
